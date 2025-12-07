@@ -1,141 +1,245 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-  <header class="hero-compact">
-    <div class="hero-inner">
-      <div class="brand-row">
-        <div class="brand">RightFit</div>
-      </div>
+# app.py
+# RightFit backend — live DuckDuckGo image search, no static product images required.
+# Requirements: Flask, requests
+# Add to requirements.txt: Flask==2.2.5, requests==2.31.0
 
-      <div class="hero-content">
-        <h1 class="hero-title">The Smart Way to Choose Your Perfect Fit</h1>
-        <p class="hero-sub">RightFit helps you discover comfort, confidence, and the size that truly fits you.</p>
-      </div>
+import os
+import re
+import time
+import json
+import logging
+from urllib.parse import quote_plus
 
-      <div class="form-floating-card" aria-hidden="false">
-        <form id="quickForm" onsubmit="return false;">
-          <div class="field"><input id="band" type="number" placeholder="Underbust (band) cm" value="78" required></div>
-          <div class="field"><input id="bust" type="number" placeholder="Full bust (bust) cm" value="90" required></div>
-          <div class="field two">
-            <select id="activity"><option>Daily / Casual</option><option>Sports / Active</option><option>High Impact</option></select>
-            <select id="root"><option>Narrow</option><option>Normal</option><option>Wide</option></select>
-          </div>
-          <div class="actions">
-            <button id="computeBtn" class="btn primary">Search</button>
-            <button id="resetBtn" class="btn ghost" type="button">Reset</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </header>
+import requests
+from flask import Flask, render_template, request, jsonify
 
-  <main class="main">
-    <section class="results-section">
-      <div id="status" class="status">Status: Ready</div>
-      <div id="results" class="results" aria-live="polite"></div>
-    </section>
-  </main>
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("rightfit_ddg")
 
-  <footer class="footer">
-    <div class="container">© 2025 RightFit</div>
-  </footer>
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
-<script>
-async function fetchResults(payload){
-  const res = await fetch('/api/results', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  });
-  return res.json();
+# ----------------------
+# Utilities and mapping
+# ----------------------
+def cup_group_from_diff(diff: int) -> str:
+    if diff < 14:
+        return "small"   # A/B
+    if 14 <= diff < 16:
+        return "medium"  # C/D
+    return "large"       # DD/E+
+
+def activity_key_name(activity_label: str) -> str:
+    mapping = {
+        'Daily / Casual': 'casual',
+        'Daily/Casual': 'casual',
+        'Daily': 'casual',
+        'Casual': 'casual',
+        'Sports / Active': 'sports',
+        'Sports/Active': 'sports',
+        'Sports': 'sports',
+        'High Impact': 'highimpact',
+        'High-Impact': 'highimpact',
+        'HighImpact': 'highimpact'
+    }
+    return mapping.get(activity_label, 'casual')
+
+# ----------------------
+# DuckDuckGo search helpers
+# ----------------------
+DDG_BASE = "https://duckduckgo.com/"
+DDG_IJS = "https://duckduckgo.com/i.js"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Referer": "https://duckduckgo.com/"
 }
+VQD_RE = re.compile(r"vqd='(?P<vqd>[\d-]+.*?)'")
 
-function makeCard(data){
-  const wrap = document.createElement('div');
-  wrap.className = 'result-card improved';
+def get_vqd_token(query: str, max_tries: int = 2) -> str | None:
+    params = {"q": query}
+    for attempt in range(1, max_tries + 1):
+        try:
+            r = requests.get(DDG_BASE, params=params, headers=HEADERS, timeout=8)
+            text = r.text
+            m = VQD_RE.search(text)
+            if m:
+                return m.group("vqd")
+        except Exception as e:
+            log.debug("vqd attempt %s failed: %s", attempt, e)
+        time.sleep(0.4 * attempt)
+    return None
 
-  // images grid
-  const imgs = document.createElement('div');
-  imgs.className = 'images-grid';
-  const labels = ['Front view','Side view','Closeup'];
-  data.images.forEach((src, i)=>{
-    const col = document.createElement('div');
-    col.className = 'img-col';
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = `${data.product_name} ${labels[i]}`;
-    img.className = 'result-img';
-    img.onerror = function(){ this.src='/static/images/p1.svg'; };
-    const lbl = document.createElement('div');
-    lbl.className = 'img-label';
-    lbl.textContent = labels[i];
-    col.appendChild(img);
-    col.appendChild(lbl);
-    imgs.appendChild(col);
-  });
+def duckduckgo_image_search(query: str, max_results: int = 8) -> list:
+    results = []
+    vqd = get_vqd_token(query)
+    if not vqd:
+        return results
+    params = {
+        "l": "us-en",
+        "o": "json",
+        "q": query,
+        "vqd": vqd,
+        "f": ",,,",
+        "p": "1"
+    }
+    try:
+        r = requests.get(DDG_IJS, params=params, headers=HEADERS, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        for item in data.get("results", [])[:max_results]:
+            img = item.get("image") or item.get("thumbnail") or item.get("url")
+            if img:
+                results.append(img)
+    except Exception as e:
+        log.warning("DuckDuckGo query failed for '%s': %s", query, e)
+    return results
 
-  // info area
-  const info = document.createElement('div');
-  info.className = 'result-info';
-  const title = document.createElement('h3');
-  title.className = 'result-title';
-  title.textContent = `${data.product_name} — ${data.size}`;
-  info.appendChild(title);
+def choose_image_from_results(results: list) -> str | None:
+    if not results:
+        return None
+    for url in results:
+        if isinstance(url, str) and url.startswith("http"):
+            lower = url.lower()
+            if any(lower.endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+                return url
+    return results[0]
 
-  const details = document.createElement('div');
-  details.className = 'result-details';
-  details.innerHTML = `<strong>Band:</strong> ${data.band} cm &nbsp;&nbsp; <strong>Bust:</strong> ${data.bust} cm<br><strong>Cup difference:</strong> ${data.cup_diff} cm`;
-  info.appendChild(details);
+# ----------------------
+# Simple JSON cache to limit repeated DDG calls (optional, stored in static/cache.json)
+# ----------------------
+CACHE_PATH = os.path.join(app.static_folder, "cache.json")
+CACHE_TTL_SECONDS = 60 * 60 * 24 * 30  # 30 days
 
-  // store buttons - stacked on small screens
-  const stores = document.createElement('div');
-  stores.className = 'store-stack';
-  const a1 = document.createElement('a');
-  a1.href = data.store_urls.amazon; a1.target='_blank';
-  a1.className = 'store-btn amazon'; a1.textContent='View on Amazon';
-  const a2 = document.createElement('a');
-  a2.href = data.store_urls.flipkart; a2.target='_blank';
-  a2.className = 'store-btn flipkart'; a2.textContent='View on Flipkart';
-  const a3 = document.createElement('a');
-  a3.href = data.store_urls.myntra; a3.target='_blank';
-  a3.className = 'store-btn myntra'; a3.textContent='View on Myntra';
-  stores.append(a1,a2,a3);
-  info.appendChild(stores);
+def load_cache() -> dict:
+    try:
+        if os.path.exists(CACHE_PATH):
+            with open(CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+    except Exception as e:
+        log.warning("Failed to load cache: %s", e)
+    return {}
 
-  wrap.append(imgs, info);
-  return wrap;
-}
+def save_cache(cache: dict):
+    try:
+        os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+        with open(CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump(cache, f)
+    except Exception as e:
+        log.warning("Failed to save cache: %s", e)
 
-document.getElementById('computeBtn').addEventListener('click', async ()=>{
-  const band = parseFloat(document.getElementById('band').value)||78;
-  const bust = parseFloat(document.getElementById('bust').value)||90;
-  const activity = document.getElementById('activity').value;
-  const root = document.getElementById('root').value;
+def cached_search(key: str, fetch_fn):
+    """
+    Look up in cache (and TTL); if not fresh, call fetch_fn() to compute and store.
+    key: string key identifying the query
+    fetch_fn: callable that returns the value to cache
+    """
+    cache = load_cache()
+    ent = cache.get(key)
+    now = int(time.time())
+    if ent and isinstance(ent, dict):
+        ts = ent.get("ts", 0)
+        if now - ts < CACHE_TTL_SECONDS:
+            return ent.get("value")
+    # not cached or expired
+    try:
+        val = fetch_fn()
+    except Exception as e:
+        log.warning("fetch_fn failed for key %s: %s", key, e)
+        val = None
+    cache[key] = {"ts": now, "value": val}
+    save_cache(cache)
+    return val
 
-  document.getElementById('status').textContent = 'Status: Searching...';
-  const data = await fetchResults({band,bust,activity,root});
-  const resultsEl = document.getElementById('results');
-  resultsEl.innerHTML = '';
-  resultsEl.appendChild(makeCard(data));
-  document.getElementById('status').textContent = 'Status: Done — results shown below.';
-  // scroll to results smoothly but keep hero visible
-  window.scrollTo({ top: document.getElementById('results').offsetTop - 90, behavior:'smooth' });
-});
+# ----------------------
+# External fallback image (data URI SVG) — no local static files required
+# ----------------------
+FALLBACK_SVG_DATAURI = (
+    "data:image/svg+xml;utf8,"
+    "<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'>"
+    "<rect width='100%' height='100%' fill='%23f7f7fb'/>"
+    "<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' "
+    "font-family='Arial' font-size='28' fill='%236b7280'>Image not available</text>"
+    "</svg>"
+)
 
-document.getElementById('resetBtn').addEventListener('click', ()=>{
-  document.getElementById('band').value=78;
-  document.getElementById('bust').value=90;
-  document.getElementById('activity').value='Daily / Casual';
-  document.getElementById('root').value='Narrow';
-  document.getElementById('results').innerHTML='';
-  document.getElementById('status').textContent='Status: Ready';
-});
-</script>
-</body>
-</html>
+# ----------------------
+# Flask routes
+# ----------------------
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/api/results", methods=["POST"])
+def results():
+    payload = request.get_json(silent=True) or {}
+    try:
+        band = float(payload.get("band", 78))
+        bust = float(payload.get("bust", 90))
+    except (ValueError, TypeError):
+        band = 78.0
+        bust = 90.0
+
+    activity = payload.get("activity", "Daily / Casual")
+    root = payload.get("root", "Narrow")
+
+    diff = max(0, round(bust - band))
+    cup = "A"
+    if 12 <= diff < 14:
+        cup = "B"
+    elif 14 <= diff < 16:
+        cup = "C"
+    elif 16 <= diff < 18:
+        cup = "D"
+    elif diff >= 18:
+        cup = "DD/E"
+
+    band_rounded = int(round(band / 5.0) * 5)
+    size = f"{band_rounded}{cup}"
+    product_name = f"Comfort {size} {activity} bra" if root != "Wide" else f"Full coverage {size} bra"
+
+    cup_group = cup_group_from_diff(diff)
+    activity_key = activity_key_name(activity)
+
+    # Build search queries tuned for product-only studio pastel photos
+    base_query = f"{size} {activity_key} bra product studio pastel background"
+    front_query = f"{base_query} front view product photo"
+    side_query = f"{base_query} 3/4 side view product photo"
+    close_query = f"{base_query} closeup fabric detail product photo"
+
+    # Use cache for each query to reduce DDG calls
+    def fetch_front():
+        return choose_image_from_results(duckduckgo_image_search(front_query, max_results=10))
+    def fetch_side():
+        return choose_image_from_results(duckduckgo_image_search(side_query, max_results=10))
+    def fetch_close():
+        return choose_image_from_results(duckduckgo_image_search(close_query, max_results=10))
+
+    front_url = cached_search(f"img:{front_query}", fetch_front) or FALLBACK_SVG_DATAURI
+    side_url = cached_search(f"img:{side_query}", fetch_side) or FALLBACK_SVG_DATAURI
+    close_url = cached_search(f"img:{close_query}", fetch_close) or FALLBACK_SVG_DATAURI
+
+    images = [front_url, side_url, close_url]
+
+    query_term = quote_plus(product_name)
+    store_urls = {
+        "amazon": f"https://www.amazon.in/s?k={query_term}",
+        "flipkart": f"https://www.flipkart.com/search?q={query_term}",
+        "myntra": f"https://www.myntra.com/search?q={query_term}"
+    }
+
+    response = {
+        "product_name": product_name,
+        "size": size,
+        "cup_diff": diff,
+        "band": band,
+        "bust": bust,
+        "images": images,
+        "store_urls": store_urls
+    }
+    return jsonify(response)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+      
