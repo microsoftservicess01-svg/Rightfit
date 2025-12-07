@@ -5,51 +5,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
   <link rel="stylesheet" href="/static/css/styles.css">
-  <style>
-    .thumb-wrapper { display:flex; flex-direction:column; align-items:center; gap:6px; }
-    .thumb-label { font-size:13px; color:#6b7280; text-align:center; }
-    .thumb { width:100%; height:220px; object-fit:cover; border-radius:10px; background:#f7f7f7; }
-    .result-card { border-radius:12px; padding:18px; }
-    .store-btns { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-    .store-btn { padding:12px 18px; border-radius:10px; font-weight:700; color:#fff; text-decoration:none; }
-    .store-btn.amazon { background:#ff9900; }
-    .store-btn.flipkart { background:#2874f0; }
-    .store-btn.myntra { background:#e83f6f; }
-  </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-top">
-      <div class="brand">RightFit</div>
-    </div>
-
-    <div class="hero-main">
-      <div class="hero-left">
-        <h1>The Smart Way to Choose Your Perfect Fit</h1>
-        <p class="lead">RightFit helps you discover comfort, confidence, and the size that truly fits you.</p>
-        <div class="features">
-          <div><h4>Accurate fit</h4><p>Band & bust based sizing</p></div>
-          <div><h4>Visual compare</h4><p>See multiple product photos</p></div>
-          <div><h4>Direct shop</h4><p>Open results on Amazon / Flipkart / Myntra</p></div>
-        </div>
+  <header class="hero-compact">
+    <div class="hero-inner">
+      <div class="brand-row">
+        <div class="brand">RightFit</div>
       </div>
 
-      <div class="hero-right">
-        <div class="form-card">
-          <h3>Get Your Recommendation</h3>
-          <form id="quickForm" onsubmit="return false;">
-            <div class="row"><input id="band" type="number" placeholder="Underbust (band) cm" value="78" required></div>
-            <div class="row"><input id="bust" type="number" placeholder="Full bust (bust) cm" value="90" required></div>
-            <div class="row two">
-              <select id="activity"><option>Daily / Casual</option><option>Sports / Active</option><option>High Impact</option></select>
-              <select id="root"><option>Narrow</option><option>Normal</option><option>Wide</option></select>
-            </div>
-            <div class="row">
-              <button id="computeBtn" class="cta">Search</button>
-              <button id="resetBtn" class="ghost" type="button">Reset</button>
-            </div>
-          </form>
-        </div>
+      <div class="hero-content">
+        <h1 class="hero-title">The Smart Way to Choose Your Perfect Fit</h1>
+        <p class="hero-sub">RightFit helps you discover comfort, confidence, and the size that truly fits you.</p>
+      </div>
+
+      <div class="form-floating-card" aria-hidden="false">
+        <form id="quickForm" onsubmit="return false;">
+          <div class="field"><input id="band" type="number" placeholder="Underbust (band) cm" value="78" required></div>
+          <div class="field"><input id="bust" type="number" placeholder="Full bust (bust) cm" value="90" required></div>
+          <div class="field two">
+            <select id="activity"><option>Daily / Casual</option><option>Sports / Active</option><option>High Impact</option></select>
+            <select id="root"><option>Narrow</option><option>Normal</option><option>Wide</option></select>
+          </div>
+          <div class="actions">
+            <button id="computeBtn" class="btn primary">Search</button>
+            <button id="resetBtn" class="btn ghost" type="button">Reset</button>
+          </div>
+        </form>
       </div>
     </div>
   </header>
@@ -57,7 +38,7 @@
   <main class="main">
     <section class="results-section">
       <div id="status" class="status">Status: Ready</div>
-      <div id="results" class="results"></div>
+      <div id="results" class="results" aria-live="polite"></div>
     </section>
   </main>
 
@@ -65,109 +46,96 @@
     <div class="container">© 2025 RightFit</div>
   </footer>
 
-  <script>
-    async function fetchResults(payload) {
-      const res = await fetch('/api/results', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      return res.json();
-    }
+<script>
+async function fetchResults(payload){
+  const res = await fetch('/api/results', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
 
-    function makeCard(data){
-      const card = document.createElement('div');
-      card.className = 'result-card';
+function makeCard(data){
+  const wrap = document.createElement('div');
+  wrap.className = 'result-card improved';
 
-      const grid = document.createElement('div');
-      grid.style.display = 'grid';
-      grid.style.gridTemplateColumns = '1fr';
-      grid.style.gap = '14px';
+  // images grid
+  const imgs = document.createElement('div');
+  imgs.className = 'images-grid';
+  const labels = ['Front view','Side view','Closeup'];
+  data.images.forEach((src, i)=>{
+    const col = document.createElement('div');
+    col.className = 'img-col';
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = `${data.product_name} ${labels[i]}`;
+    img.className = 'result-img';
+    img.onerror = function(){ this.src='/static/images/p1.svg'; };
+    const lbl = document.createElement('div');
+    lbl.className = 'img-label';
+    lbl.textContent = labels[i];
+    col.appendChild(img);
+    col.appendChild(lbl);
+    imgs.appendChild(col);
+  });
 
-      const thumbsRow = document.createElement('div');
-      thumbsRow.style.display = 'flex';
-      thumbsRow.style.gap = '12px';
-      thumbsRow.style.flexWrap = 'wrap';
+  // info area
+  const info = document.createElement('div');
+  info.className = 'result-info';
+  const title = document.createElement('h3');
+  title.className = 'result-title';
+  title.textContent = `${data.product_name} — ${data.size}`;
+  info.appendChild(title);
 
-      const labels = ['Front view', 'Side view', 'Closeup'];
-      data.images.forEach((src, idx) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'thumb-wrapper';
-        wrapper.style.flex = '1 1 260px';
-        const img = document.createElement('img');
-        img.className = 'thumb';
-        img.src = src;
-        img.alt = `${data.product_name} ${labels[idx]}`;
-        img.onerror = function(){ this.src = '/static/images/p1.svg'; };
-        const lbl = document.createElement('div');
-        lbl.className = 'thumb-label';
-        lbl.textContent = labels[idx];
-        wrapper.appendChild(img);
-        wrapper.appendChild(lbl);
-        thumbsRow.appendChild(wrapper);
-      });
+  const details = document.createElement('div');
+  details.className = 'result-details';
+  details.innerHTML = `<strong>Band:</strong> ${data.band} cm &nbsp;&nbsp; <strong>Bust:</strong> ${data.bust} cm<br><strong>Cup difference:</strong> ${data.cup_diff} cm`;
+  info.appendChild(details);
 
-      const info = document.createElement('div');
-      info.className = 'info';
-      const title = document.createElement('h3');
-      title.textContent = `${data.product_name} — ${data.size}`;
-      info.appendChild(title);
+  // store buttons - stacked on small screens
+  const stores = document.createElement('div');
+  stores.className = 'store-stack';
+  const a1 = document.createElement('a');
+  a1.href = data.store_urls.amazon; a1.target='_blank';
+  a1.className = 'store-btn amazon'; a1.textContent='View on Amazon';
+  const a2 = document.createElement('a');
+  a2.href = data.store_urls.flipkart; a2.target='_blank';
+  a2.className = 'store-btn flipkart'; a2.textContent='View on Flipkart';
+  const a3 = document.createElement('a');
+  a3.href = data.store_urls.myntra; a3.target='_blank';
+  a3.className = 'store-btn myntra'; a3.textContent='View on Myntra';
+  stores.append(a1,a2,a3);
+  info.appendChild(stores);
 
-      const details = document.createElement('p');
-      details.innerHTML = `<strong>Band:</strong> ${data.band} cm &nbsp; <strong>Bust:</strong> ${data.bust} cm<br>
-                           <strong>Cup difference:</strong> ${data.cup_diff} cm`;
-      info.appendChild(details);
+  wrap.append(imgs, info);
+  return wrap;
+}
 
-      const storeRow = document.createElement('div');
-      storeRow.className = 'store-btns';
-      const a1 = document.createElement('a');
-      a1.className = 'store-btn amazon';
-      a1.href = data.store_urls.amazon; a1.target = '_blank';
-      a1.textContent = 'View on Amazon';
+document.getElementById('computeBtn').addEventListener('click', async ()=>{
+  const band = parseFloat(document.getElementById('band').value)||78;
+  const bust = parseFloat(document.getElementById('bust').value)||90;
+  const activity = document.getElementById('activity').value;
+  const root = document.getElementById('root').value;
 
-      const a2 = document.createElement('a');
-      a2.className = 'store-btn flipkart';
-      a2.href = data.store_urls.flipkart; a2.target = '_blank';
-      a2.textContent = 'View on Flipkart';
+  document.getElementById('status').textContent = 'Status: Searching...';
+  const data = await fetchResults({band,bust,activity,root});
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = '';
+  resultsEl.appendChild(makeCard(data));
+  document.getElementById('status').textContent = 'Status: Done — results shown below.';
+  // scroll to results smoothly but keep hero visible
+  window.scrollTo({ top: document.getElementById('results').offsetTop - 90, behavior:'smooth' });
+});
 
-      const a3 = document.createElement('a');
-      a3.className = 'store-btn myntra';
-      a3.href = data.store_urls.myntra; a3.target = '_blank';
-      a3.textContent = 'View on Myntra';
-
-      storeRow.append(a1, a2, a3);
-      info.appendChild(storeRow);
-
-      grid.appendChild(thumbsRow);
-      grid.appendChild(info);
-      card.appendChild(grid);
-
-      return card;
-    }
-
-    document.getElementById('computeBtn').addEventListener('click', async ()=>{
-      const band = parseFloat(document.getElementById('band').value)||78;
-      const bust = parseFloat(document.getElementById('bust').value)||90;
-      const activity = document.getElementById('activity').value;
-      const root = document.getElementById('root').value;
-
-      document.getElementById('status').textContent = 'Status: Searching...';
-      const data = await fetchResults({band,bust,activity,root});
-      const resultsEl = document.getElementById('results');
-      resultsEl.innerHTML = '';
-      resultsEl.appendChild(makeCard(data));
-      document.getElementById('status').textContent = 'Status: Done — results shown below.';
-      resultsEl.scrollIntoView({behavior:'smooth', block:'start'});
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
-      document.getElementById('band').value=78;
-      document.getElementById('bust').value=90;
-      document.getElementById('activity').value='Daily / Casual';
-      document.getElementById('root').value='Narrow';
-      document.getElementById('results').innerHTML='';
-      document.getElementById('status').textContent='Status: Ready';
-    });
-  </script>
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  document.getElementById('band').value=78;
+  document.getElementById('bust').value=90;
+  document.getElementById('activity').value='Daily / Casual';
+  document.getElementById('root').value='Narrow';
+  document.getElementById('results').innerHTML='';
+  document.getElementById('status').textContent='Status: Ready';
+});
+</script>
 </body>
 </html>
