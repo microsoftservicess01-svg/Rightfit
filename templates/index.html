@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -6,8 +6,10 @@
   <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: linear-gradient(180deg,#071426,#0f2b3a); color: #fff; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    .card { background: #fff; color: #0b1220; border-radius: 14px; box-shadow: 0 18px 36px rgba(2,6,23,0.5); }
+    body { background: linear-gradient(180deg, #071426, #0f2b3a); color: #fff; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .card { background: #fff; color: #0b1220; border-radius: 14px; box-shadow: 0 18px 36px rgba(2,6,23,0.45); }
+    .theme-toggle { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 8px; cursor: pointer; color: #e6eef7; font-weight:700; }
+    .chip { background: rgba(2,6,23,0.04); border-radius: 10px; padding:6px 10px; font-weight:700; color:#0b1220; }
   </style>
 </head>
 <body class="p-4">
@@ -18,10 +20,17 @@
         <h1 class="text-2xl font-extrabold">RightFit</h1>
         <p class="text-sm text-slate-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
       </div>
+
+      <div class="flex items-center gap-3">
+        <div id="aiMode" class="chip" title="Use custom AI studio image">AI sample</div>
+        <button id="darkToggle" class="theme-toggle" title="Toggle darker sample">Dark sample</button>
+      </div>
     </div>
   </header>
 
   <main class="max-w-3xl mx-auto">
+
+    <!-- FORM CARD -->
     <section class="card p-6">
       <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
 
@@ -46,12 +55,12 @@
       </div>
     </section>
 
+    <!-- RESULTS CARD -->
     <section id="resultsCard" class="card p-6 mt-6 hidden">
-      <h3 class="text-xl font-bold mb-4" id="productName">Comfort 80B — Example</h3>
+      <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
 
       <div class="flex justify-center mb-4">
-        <!-- result image: backend image OR sample image fallback -->
-        <img id="resultImage" src="https://picsum.photos/800/600?random=42" alt="Product sample" class="w-full max-w-md rounded-lg object-cover shadow-lg" />
+        <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
       </div>
 
       <div class="text-slate-700 mb-4">
@@ -66,19 +75,79 @@
         <a id="myntraBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#e83f6f] text-white" target="_blank" rel="noopener">View on Myntra</a>
       </div>
     </section>
+
   </main>
 
   <script>
-    const sampleImage = "https://picsum.photos/800/600?random=42"; // stable sample illustration (replace if you want a different source)
+    /*******************************
+     *  Sample image sources (stable)
+     *
+     *  These are stable Unsplash product images suitable as product-only studio shots.
+     *  You can replace any URL here with your own image (AI-generated or hosted).
+     *******************************/
 
-    document.getElementById("searchBtn").addEventListener("click", async () => {
+    // Daily / Casual (T-shirt / everyday)
+    const UNSPLASH_DAILY = "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&w=1200&q=80";
+
+    // Sports (sports-bra-like product shot)
+    const UNSPLASH_SPORTS = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&w=1200&q=80";
+
+    // High-impact (supportive product shot)
+    const UNSPLASH_HIGHIMPACT = "https://images.unsplash.com/photo-1593032465178-3f2f8b3f2f4f?auto=format&w=1200&q=80";
+
+    // Darker-themed sample (for 'Dark sample' toggle) - higher contrast studio
+    const UNSPLASH_DARK_SAMPLE = "https://images.unsplash.com/photo-1557682250-ffe0f1659a77?auto=format&w=1200&q=80";
+
+    // AI studio product shot placeholder (replace with your generated AI image URL)
+    const AI_STUDIO_SAMPLE = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&w=1200&q=80";
+
+    // Mapping by activity label used in form
+    const ACTIVITY_MAP = {
+      "Daily / Casual": UNSPLASH_DAILY,
+      "Sports / Active": UNSPLASH_SPORTS,
+      "High Impact": UNSPLASH_HIGHIMPACT
+    };
+
+    // UI state
+    let useDarkSample = false;
+    let useAiSample = false;
+
+    // Elements
+    const darkToggle = document.getElementById("darkToggle");
+    const aiMode = document.getElementById("aiMode");
+    const searchBtn = document.getElementById("searchBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // Toggle dark sample
+    darkToggle.addEventListener("click", () => {
+      useDarkSample = !useDarkSample;
+      darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
+      darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
+    });
+
+    // Toggle AI sample (click the small chip)
+    aiMode.addEventListener("click", () => {
+      useAiSample = !useAiSample;
+      aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
+      aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
+    });
+
+    // Helper to pick fallback sample based on activity & toggles
+    function pickSample(activityLabel) {
+      if (useAiSample) return AI_STUDIO_SAMPLE;
+      if (useDarkSample) return UNSPLASH_DARK_SAMPLE;
+      return ACTIVITY_MAP[activityLabel] || UNSPLASH_DAILY;
+    }
+
+    // Main search action
+    searchBtn.addEventListener("click", async () => {
       const band = parseFloat(document.getElementById("bandInput").value) || 78;
       const bust = parseFloat(document.getElementById("bustInput").value) || 90;
-      const activity = document.getElementById("activityInput").value;
-      const root = document.getElementById("rootInput").value;
+      const activity = document.getElementById("activityInput").value || "Daily / Casual";
+      const root = document.getElementById("rootInput").value || "Narrow";
 
-      document.getElementById("searchBtn").disabled = true;
-      document.getElementById("searchBtn").textContent = "Searching...";
+      searchBtn.disabled = true;
+      searchBtn.textContent = "Searching...";
 
       try {
         const res = await fetch("/api/results", {
@@ -86,41 +155,47 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ band, bust, activity, root })
         });
+
         const data = await res.json();
 
-        // Use backend image if available and not a tiny data-URI placeholder; else use sample
-        let img = (data.images && data.images.length > 0) ? data.images[0] : null;
-
-        // Treat tiny inline data URIs as fallback to sample image
-        if (!img || img.startsWith("data:image/svg+xml")) {
-          img = sampleImage;
+        // Use backend image if provided and it looks like a URL; else use selected sample
+        let imgUrl = null;
+        if (data.images && data.images.length > 0) {
+          const candidate = data.images[0];
+          // treat tiny svg data URIs as "no image"
+          if (typeof candidate === "string" && candidate.length > 40 && !candidate.startsWith("data:image/svg+xml")) {
+            imgUrl = candidate;
+          }
+        }
+        if (!imgUrl) {
+          imgUrl = pickSample(activity);
         }
 
-        document.getElementById("resultImage").src = img;
-        document.getElementById("productName").textContent = data.product_name || "RightFit result";
-        document.getElementById("bandVal").textContent = data.band;
-        document.getElementById("bustVal").textContent = data.bust;
-        document.getElementById("cupVal").textContent = data.cup_diff;
+        // Set UI values
+        document.getElementById("resultImage").src = imgUrl;
+        document.getElementById("productName").textContent = data.product_name || ("Comfort " + (Math.round(band/5)*5) + "X");
+        document.getElementById("bandVal").textContent = data.band || band;
+        document.getElementById("bustVal").textContent = data.bust || bust;
+        document.getElementById("cupVal").textContent = data.cup_diff ?? Math.round((bust-band)) ;
 
-        // Set all three store links (backend returns store_urls; amazon guaranteed)
-        document.getElementById("amazonBtn").href = data.store_urls?.amazon || "#";
+        // store links (backend returns them; build fallbacks if not present)
+        document.getElementById("amazonBtn").href = data.store_urls?.amazon || `https://www.amazon.in/s?k=${encodeURIComponent(data.product_name||"bra")}`;
         document.getElementById("flipkartBtn").href = data.store_urls?.flipkart || `https://www.flipkart.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
         document.getElementById("myntraBtn").href = data.store_urls?.myntra || `https://www.myntra.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
 
-        // show results
         document.getElementById("resultsCard").classList.remove("hidden");
-        window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" });
+        setTimeout(()=> window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" }), 120);
 
       } catch (err) {
-        console.error("Failed to fetch results:", err);
-        alert("Unable to fetch results right now. Try again.");
+        console.error("Error fetching results:", err);
+        alert("Could not fetch results — try again.");
       } finally {
-        document.getElementById("searchBtn").disabled = false;
-        document.getElementById("searchBtn").textContent = "Search";
+        searchBtn.disabled = false;
+        searchBtn.textContent = "Search";
       }
     });
 
-    document.getElementById("resetBtn").addEventListener("click", () => {
+    resetBtn.addEventListener("click", () => {
       document.getElementById("bandInput").value = 78;
       document.getElementById("bustInput").value = 90;
       document.getElementById("activityInput").value = "Daily / Casual";
