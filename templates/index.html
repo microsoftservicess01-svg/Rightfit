@@ -1,142 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RightFit</title>
-
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        body {
-            background: linear-gradient(to bottom right, #0f172a, #1e293b);
-            color: white;
-            font-family: "Inter", sans-serif;
-            min-height: 100vh;
-        }
-        .card {
-            background: white;
-            color: #1e293b;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: linear-gradient(180deg,#071426,#0f2b3a); color: #fff; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .card { background: #fff; color: #0b1220; border-radius: 14px; box-shadow: 0 18px 36px rgba(2,6,23,0.5); }
+  </style>
 </head>
-
 <body class="p-4">
 
-    <!-- HEADER -->
-    <header class="mb-6">
-        <h1 class="text-3xl font-bold">RightFit</h1>
-        <p class="text-gray-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
-    </header>
-
-    <!-- FORM CARD -->
-    <div class="card rounded-xl p-6 shadow-lg max-w-xl mx-auto">
-
-        <h2 class="text-xl font-bold mb-4 text-center text-gray-800">
-            Get Your Recommendation
-        </h2>
-
-        <div class="space-y-4">
-
-            <input id="bandInput"
-                type="number"
-                placeholder="Underbust (band) cm"
-                class="w-full p-3 border rounded-lg" />
-
-            <input id="bustInput"
-                type="number"
-                placeholder="Full bust (bust) cm"
-                class="w-full p-3 border rounded-lg" />
-
-            <select id="activityInput" class="w-full p-3 border rounded-lg">
-                <option>Daily / Casual</option>
-                <option>Sports / Active</option>
-                <option>High Impact</option>
-            </select>
-
-            <select id="rootInput" class="w-full p-3 border rounded-lg">
-                <option>Narrow</option>
-                <option>Average</option>
-                <option>Wide</option>
-            </select>
-        </div>
-
-        <button id="searchBtn"
-            class="w-full mt-5 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold">
-            Search
-        </button>
-
+  <header class="mb-6 max-w-3xl mx-auto">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-extrabold">RightFit</h1>
+        <p class="text-sm text-slate-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
+      </div>
     </div>
+  </header>
 
-    <!-- RESULTS CARD -->
-    <div id="results"
-        class="card rounded-xl p-6 shadow-lg max-w-xl mx-auto mt-8 hidden">
+  <main class="max-w-3xl mx-auto">
+    <section class="card p-6">
+      <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
 
-        <h2 class="text-2xl font-bold mb-4 text-center">Your Fit Result</h2>
+      <div class="space-y-3">
+        <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
+        <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
+        <select id="activityInput" class="w-full p-3 rounded-lg border">
+          <option>Daily / Casual</option>
+          <option>Sports / Active</option>
+          <option>High Impact</option>
+        </select>
+        <select id="rootInput" class="w-full p-3 rounded-lg border">
+          <option>Narrow</option>
+          <option>Average</option>
+          <option>Wide</option>
+        </select>
+      </div>
 
-        <!-- Single Image -->
-        <div class="flex justify-center mb-6">
-            <img id="resultImage"
-                class="rounded-xl shadow-lg w-full max-w-md object-cover bg-gray-100"
-                src=""
-                alt="Product image" />
-        </div>
+      <div class="mt-4 flex gap-3">
+        <button id="searchBtn" class="flex-1 py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white">Search</button>
+        <button id="resetBtn" class="py-3 px-4 rounded-lg font-semibold bg-white/10">Reset</button>
+      </div>
+    </section>
 
-        <!-- Product Name -->
-        <p id="productName" class="text-xl font-semibold text-center mb-4"></p>
+    <section id="resultsCard" class="card p-6 mt-6 hidden">
+      <h3 class="text-xl font-bold mb-4" id="productName">Comfort 80B — Example</h3>
 
-        <div class="text-gray-700 text-center">
-            <p><strong>Band:</strong> <span id="bandVal"></span> cm</p>
-            <p><strong>Bust:</strong> <span id="bustVal"></span> cm</p>
-            <p><strong>Cup difference:</strong> <span id="cupVal"></span> cm</p>
-        </div>
+      <div class="flex justify-center mb-4">
+        <!-- result image: backend image OR sample image fallback -->
+        <img id="resultImage" src="https://picsum.photos/800/600?random=42" alt="Product sample" class="w-full max-w-md rounded-lg object-cover shadow-lg" />
+      </div>
 
-        <!-- Store Button -->
-        <div class="mt-6 flex justify-center">
-            <a id="amazonBtn"
-                target="_blank"
-                class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-semibold shadow">
-                View on Amazon
-            </a>
-        </div>
+      <div class="text-slate-700 mb-4">
+        <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
+        <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
+        <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
+      </div>
 
-    </div>
+      <div class="flex gap-3">
+        <a id="amazonBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#ff9900] text-white" target="_blank" rel="noopener">View on Amazon</a>
+        <a id="flipkartBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#2874f0] text-white" target="_blank" rel="noopener">View on Flipkart</a>
+        <a id="myntraBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#e83f6f] text-white" target="_blank" rel="noopener">View on Myntra</a>
+      </div>
+    </section>
+  </main>
 
-    <script>
-        document.getElementById("searchBtn").addEventListener("click", async () => {
-            const band = document.getElementById("bandInput").value;
-            const bust = document.getElementById("bustInput").value;
-            const activity = document.getElementById("activityInput").value;
-            const root = document.getElementById("rootInput").value;
+  <script>
+    const sampleImage = "https://picsum.photos/800/600?random=42"; // stable sample illustration (replace if you want a different source)
 
-            const payload = { band, bust, activity, root };
+    document.getElementById("searchBtn").addEventListener("click", async () => {
+      const band = parseFloat(document.getElementById("bandInput").value) || 78;
+      const bust = parseFloat(document.getElementById("bustInput").value) || 90;
+      const activity = document.getElementById("activityInput").value;
+      const root = document.getElementById("rootInput").value;
 
-            const res = await fetch("/api/results", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+      document.getElementById("searchBtn").disabled = true;
+      document.getElementById("searchBtn").textContent = "Searching...";
 
-            const data = await res.json();
-
-            // Load only FIRST IMAGE
-            const img = data.images?.[0] || "";
-            document.getElementById("resultImage").src = img;
-
-            // Set text fields
-            document.getElementById("productName").textContent = data.product_name;
-            document.getElementById("bandVal").textContent = data.band;
-            document.getElementById("bustVal").textContent = data.bust;
-            document.getElementById("cupVal").textContent = data.cup_diff;
-
-            // Amazon button
-            document.getElementById("amazonBtn").href = data.store_urls.amazon;
-
-            // Show card
-            document.getElementById("results").classList.remove("hidden");
+      try {
+        const res = await fetch("/api/results", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ band, bust, activity, root })
         });
-    </script>
+        const data = await res.json();
 
+        // Use backend image if available and not a tiny data-URI placeholder; else use sample
+        let img = (data.images && data.images.length > 0) ? data.images[0] : null;
+
+        // Treat tiny inline data URIs as fallback to sample image
+        if (!img || img.startsWith("data:image/svg+xml")) {
+          img = sampleImage;
+        }
+
+        document.getElementById("resultImage").src = img;
+        document.getElementById("productName").textContent = data.product_name || "RightFit result";
+        document.getElementById("bandVal").textContent = data.band;
+        document.getElementById("bustVal").textContent = data.bust;
+        document.getElementById("cupVal").textContent = data.cup_diff;
+
+        // Set all three store links (backend returns store_urls; amazon guaranteed)
+        document.getElementById("amazonBtn").href = data.store_urls?.amazon || "#";
+        document.getElementById("flipkartBtn").href = data.store_urls?.flipkart || `https://www.flipkart.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
+        document.getElementById("myntraBtn").href = data.store_urls?.myntra || `https://www.myntra.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
+
+        // show results
+        document.getElementById("resultsCard").classList.remove("hidden");
+        window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" });
+
+      } catch (err) {
+        console.error("Failed to fetch results:", err);
+        alert("Unable to fetch results right now. Try again.");
+      } finally {
+        document.getElementById("searchBtn").disabled = false;
+        document.getElementById("searchBtn").textContent = "Search";
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      document.getElementById("bandInput").value = 78;
+      document.getElementById("bustInput").value = 90;
+      document.getElementById("activityInput").value = "Daily / Casual";
+      document.getElementById("rootInput").value = "Narrow";
+      document.getElementById("resultsCard").classList.add("hidden");
+    });
+  </script>
 </body>
 </html>
