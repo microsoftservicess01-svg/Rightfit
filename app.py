@@ -1,7 +1,8 @@
 # app.py
 # Replace your current app.py with this file.
-# Expects generated AI images placed in: static/images/ai/
-# Filenames (example): model_casual_small_front.jpg, model_sports_medium_side.jpg, model_highimpact_large_closeup.jpg
+# Expects AI-generated product images placed at:
+# static/images/ai/model_{activity}_{cupgroup}_{view}.jpg
+# e.g. static/images/ai/model_casual_small_front.jpg
 
 import os
 from flask import Flask, render_template, request, jsonify
@@ -12,7 +13,7 @@ app = Flask(__name__, static_folder='static', template_folder='templates')
 def cup_group_from_diff(diff: int) -> str:
     """
     Map cup-difference (bust - band) to a cup group.
-    Adjust thresholds here as you need.
+    Adjust thresholds as needed.
     """
     if diff < 14:
         return "small"   # A/B
@@ -23,8 +24,7 @@ def cup_group_from_diff(diff: int) -> str:
 
 def activity_key_name(activity_label: str) -> str:
     """
-    Map the frontend activity text to a simplified key used in file names.
-    Add mappings if your frontend uses different labels.
+    Map the frontend activity text to simplified keys used in filenames.
     """
     mapping = {
         'Daily / Casual': 'casual',
@@ -43,11 +43,10 @@ def activity_key_name(activity_label: str) -> str:
 
 def static_file_exists(path_from_static_root: str) -> bool:
     """
-    Check existence of a file under the Flask static folder.
-    path_from_static_root should start with 'images/...' or similar (no leading slash).
+    Check if a file exists under app.static_folder.
+    path_from_static_root should be like 'images/ai/...'
     """
-    static_root = app.static_folder  # e.g. /path/to/project/static
-    full = os.path.join(static_root, path_from_static_root)
+    full = os.path.join(app.static_folder, path_from_static_root)
     return os.path.exists(full)
 
 
@@ -64,16 +63,16 @@ def results():
     """
     payload = request.get_json(silent=True) or {}
     try:
-        band = float(payload.get('band', 78))
-        bust = float(payload.get('bust', 90))
+        band = float(payload.get('band', 0))
+        bust = float(payload.get('bust', 0))
     except (ValueError, TypeError):
-        band = 78.0
-        bust = 90.0
+        band = 0.0
+        bust = 0.0
 
     activity = payload.get('activity', 'Daily / Casual')
     root = payload.get('root', 'Narrow')
 
-    # Basic sizing logic (can be replaced with your own)
+    # Basic sizing logic
     diff = max(0, round(bust - band))
     cup = "A"
     if 12 <= diff < 14:
@@ -90,33 +89,33 @@ def results():
     product_name = f"Comfort {size} {activity} bra" if root != 'Wide' else f"Full coverage {size} bra"
 
     # Determine cup group & activity key for filenames
-    cup_group = cup_group_from_diff(diff)  # "small" / "medium" / "large"
-    activity_key = activity_key_name(activity)  # "casual" / "sports" / "highimpact"
+    cup_group = cup_group_from_diff(diff)  # "small"/"medium"/"large"
+    activity_key = activity_key_name(activity)  # "casual"/"sports"/"highimpact"
 
-    # Build expected AI image file paths (under static/images/ai/)
-    ai_base_path = 'images/ai'  # relative to static folder
-    desired_images = [
-        os.path.join(ai_base_path, f"model_{activity_key}_{cup_group}_front.jpg"),
-        os.path.join(ai_base_path, f"model_{activity_key}_{cup_group}_side.jpg"),
-        os.path.join(ai_base_path, f"model_{activity_key}_{cup_group}_closeup.jpg"),
-    ]
+    # expected base relative to static folder
+    ai_base = 'images/ai'
+    views = ['front', 'side', 'closeup']
+    desired = [os.path.join(ai_base, f"model_{activity_key}_{cup_group}_{v}.jpg") for v in views]
 
-    # Validate files exist, otherwise fallback to known local placeholders
-    fallback_placeholder = 'images/p1.svg'  # keep it in static/images/p1.svg
+    # Validate existence and allow png/svg fallbacks
+    fallback_placeholder = 'images/p1.svg'
     returned_images = []
-    for rel in desired_images:
-        # rel is like 'images/ai/model_casual_small_front.jpg'
+    for rel in desired:
+        # Try .jpg (as provided), then .png, then .svg
         if static_file_exists(rel):
-            returned_images.append('/' + rel.replace(os.path.sep, '/'))  # convert to web path
-        else:
-            # try jpg and png variants (some generators may save png); attempt replacements
-            alt_jpg = rel.replace('.jpg', '.png')
-            if static_file_exists(alt_jpg):
-                returned_images.append('/' + alt_jpg.replace(os.path.sep, '/'))
-            else:
-                returned_images.append('/' + fallback_placeholder)
+            returned_images.append('/' + rel.replace(os.path.sep, '/'))
+            continue
+        alt_png = rel.replace('.jpg', '.png')
+        if static_file_exists(alt_png):
+            returned_images.append('/' + alt_png.replace(os.path.sep, '/'))
+            continue
+        alt_svg = rel.replace('.jpg', '.svg')
+        if static_file_exists(alt_svg):
+            returned_images.append('/' + alt_svg.replace(os.path.sep, '/'))
+            continue
+        returned_images.append('/' + fallback_placeholder)
 
-    # Build store search URLs (simple search by product name)
+    # Build store search URLs
     query_term = product_name.replace(" ", "+")
     store_urls = {
         'amazon': f'https://www.amazon.in/s?k={query_term}',
@@ -138,7 +137,6 @@ def results():
 
 
 if __name__ == '__main__':
-    # On Render (or other PaaS) the PORT env var will be set automatically.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
     
