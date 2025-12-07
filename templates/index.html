@@ -3,18 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BraFit — Stylish Landing</title>
+  <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
   <link rel="stylesheet" href="/static/css/styles.css">
 </head>
+
 <body>
+
   <header class="hero">
     <div class="hero-top">
-      <div class="brand">BraFit</div>
+      <div class="brand">RightFit</div>
     </div>
+
     <div class="hero-main">
       <div class="hero-left">
-        <h1>Professional Certificate Programme in Fit</h1>
-        <p class="lead">Find an in-depth sizing recommendation and visual comparison to help you choose the right bra.</p>
+
+        <!-- ⭐ UPDATED TITLE + TAGLINE ⭐ -->
+        <h1>The Smart Way to Choose Your Perfect Fit</h1>
+        <p class="lead">RightFit helps you discover comfort, confidence, and the size that truly fits you.</p>
 
         <div class="features">
           <div>
@@ -30,28 +35,48 @@
             <p>Open results on Amazon / Flipkart / Myntra</p>
           </div>
         </div>
+
       </div>
 
       <div class="hero-right">
         <div class="form-card">
           <h3>Get Your Recommendation</h3>
+
           <form id="quickForm" onsubmit="return false;">
-            <div class="row"><input id="band" type="number" placeholder="Underbust (band) cm" value="78" required></div>
-            <div class="row"><input id="bust" type="number" placeholder="Full bust (bust) cm" value="90" required></div>
-            <div class="row two">
-              <select id="activity"><option>Daily / Casual</option><option>Sports / Active</option><option>High Impact</option></select>
-              <select id="root"><option>Narrow</option><option>Normal</option><option>Wide</option></select>
+            <div class="row">
+              <input id="band" type="number" placeholder="Underbust (band) cm" value="78" required>
             </div>
+
+            <div class="row">
+              <input id="bust" type="number" placeholder="Full bust (bust) cm" value="90" required>
+            </div>
+
+            <div class="row two">
+              <select id="activity">
+                <option>Daily / Casual</option>
+                <option>Sports / Active</option>
+                <option>High Impact</option>
+              </select>
+
+              <select id="root">
+                <option>Narrow</option>
+                <option>Normal</option>
+                <option>Wide</option>
+              </select>
+            </div>
+
             <div class="row">
               <button id="computeBtn" class="cta">Search</button>
               <button id="resetBtn" class="ghost" type="button">Reset</button>
             </div>
+
             <p class="muted small">We only use your inputs to compute recommendations on-device.</p>
           </form>
         </div>
       </div>
     </div>
   </header>
+
 
   <main class="main">
     <section class="results-section">
@@ -60,9 +85,11 @@
     </section>
   </main>
 
+
   <footer class="footer">
-    <div class="container">© 2025 BraFit</div>
+    <div class="container">© 2025 RightFit</div>
   </footer>
+
 
   <script>
     async function fetchResults(payload) {
@@ -77,9 +104,11 @@
     function makeCard(data){
       const card = document.createElement('div');
       card.className = 'result-card';
+
       const imgCol = document.createElement('div');
       imgCol.className = 'thumbs';
-      data.images.forEach(src=>{
+
+      data.images.forEach(src => {
         const img = document.createElement('img');
         img.className = 'thumb';
         img.src = src;
@@ -90,27 +119,40 @@
 
       const info = document.createElement('div');
       info.className = 'info';
+
       const title = document.createElement('h3');
       title.textContent = `${data.product_name} — ${data.size}`;
       info.appendChild(title);
 
       const details = document.createElement('p');
-      details.innerHTML = `<strong>Band:</strong> ${data.band} cm &nbsp; <strong>Bust:</strong> ${data.bust} cm<br>
-                           <strong>Cup difference:</strong> ${data.cup_diff} cm`;
+      details.innerHTML =
+        `<strong>Band:</strong> ${data.band} cm &nbsp; 
+         <strong>Bust:</strong> ${data.bust} cm<br>
+         <strong>Cup difference:</strong> ${data.cup_diff} cm`;
       info.appendChild(details);
 
       const links = document.createElement('div');
       links.className = 'links';
+
       const a1 = document.createElement('a');
-      a1.className = 'store-link amazon'; a1.href = data.store_urls.amazon; a1.target='_blank';
-      a1.textContent='View on Amazon';
+      a1.className = 'store-link amazon';
+      a1.href = data.store_urls.amazon;
+      a1.target = '_blank';
+      a1.textContent = 'View on Amazon';
+
       const a2 = document.createElement('a');
-      a2.className = 'store-link flipkart'; a2.href = data.store_urls.flipkart; a2.target='_blank';
-      a2.textContent='View on Flipkart';
+      a2.className = 'store-link flipkart';
+      a2.href = data.store_urls.flipkart;
+      a2.target = '_blank';
+      a2.textContent = 'View on Flipkart';
+
       const a3 = document.createElement('a');
-      a3.className = 'store-link myntra'; a3.href = data.store_urls.myntra; a3.target='_blank';
-      a3.textContent='View on Myntra';
-      links.append(a1,a2,a3);
+      a3.className = 'store-link myntra';
+      a3.href = data.store_urls.myntra;
+      a3.target = '_blank';
+      a3.textContent = 'View on Myntra';
+
+      links.append(a1, a2, a3);
       info.appendChild(links);
 
       card.append(imgCol, info);
@@ -124,22 +166,27 @@
       const root = document.getElementById('root').value;
 
       document.getElementById('status').textContent = 'Status: Searching...';
+
       const data = await fetchResults({band,bust,activity,root});
       const resultsEl = document.getElementById('results');
+
       resultsEl.innerHTML = '';
       resultsEl.appendChild(makeCard(data));
+
       document.getElementById('status').textContent = 'Status: Done — results shown below.';
-      resultsEl.scrollIntoView({behavior:'smooth', block:'start'});
+      resultsEl.scrollIntoView({behavior:'smooth'});
     });
 
     document.getElementById('resetBtn').addEventListener('click', ()=>{
-      document.getElementById('band').value=78;
-      document.getElementById('bust').value=90;
-      document.getElementById('activity').value='Daily / Casual';
-      document.getElementById('root').value='Narrow';
-      document.getElementById('results').innerHTML='';
-      document.getElementById('status').textContent='Status: Ready';
+      document.getElementById('band').value = 78;
+      document.getElementById('bust').value = 90;
+      document.getElementById('activity').value = 'Daily / Casual';
+      document.getElementById('root').value = 'Narrow';
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('status').textContent = 'Status: Ready';
     });
   </script>
+
 </body>
 </html>
+
