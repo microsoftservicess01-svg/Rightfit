@@ -89,20 +89,20 @@ def results():
     query_term = quote_plus(product_name)
     query_term = quote_plus(product_name)
 
-store_urls = {
-    # Indian lingerie brands FIRST
-    'zivame': f'https://www.zivame.com/catalogsearch/result/?q={query_term}',
-    'clovia': f'https://www.clovia.com/search/?q={query_term}',
-    'shyaway': f'https://www.shyaway.com/catalogsearch/result/?q={query_term}',
-    'enamor': f'https://www.enamor.co.in/search?q={query_term}',
-    'amante': f'https://www.amantelingerie.com/search?q={query_term}',
 
-    # E-commerce platforms after brand stores
-    'amazon': f'https://www.amazon.in/s?k={query_term}',
-    'flipkart': f'https://www.flipkart.com/search?q={query_term}',
-    'myntra': f'https://www.myntra.com/search?q={query_term}',
-}
+    store_urls = {
+        # Indian lingerie brands FIRST
+        'zivame': f'https://www.zivame.com/catalogsearch/result/?q={query_term}',
+        'clovia': f'https://www.clovia.com/search/?q={query_term}',
+        'shyaway': f'https://www.shyaway.com/catalogsearch/result/?q={query_term}',
+        'enamor': f'https://www.enamor.co.in/search?q={query_term}',
+        'amante': f'https://www.amantelingerie.com/search?q={query_term}',
 
+        # E-commerce platforms after brand stores
+        'amazon': f'https://www.amazon.in/s?k={query_term}',
+        'flipkart': f'https://www.flipkart.com/search?q={query_term}',
+        'myntra': f'https://www.myntra.com/search?q={query_term}',
+    }
 
     response = {
         'product_name': product_name,
@@ -113,10 +113,11 @@ store_urls = {
         'images': images,
         'store_urls': store_urls
     }
+
     return jsonify(response)
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-    
     
