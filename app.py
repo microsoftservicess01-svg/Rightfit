@@ -87,11 +87,22 @@ def results():
     images = [PLACEHOLDER_FRONT, PLACEHOLDER_SIDE, PLACEHOLDER_CLOSE]
 
     query_term = quote_plus(product_name)
-    store_urls = {
-        'amazon': f'https://www.amazon.in/s?k={query_term}',
-        'flipkart': f'https://www.flipkart.com/search?q={query_term}',
-        'myntra': f'https://www.myntra.com/search?q={query_term}'
-    }
+    query_term = quote_plus(product_name)
+
+store_urls = {
+    # Indian lingerie brands FIRST
+    'zivame': f'https://www.zivame.com/catalogsearch/result/?q={query_term}',
+    'clovia': f'https://www.clovia.com/search/?q={query_term}',
+    'shyaway': f'https://www.shyaway.com/catalogsearch/result/?q={query_term}',
+    'enamor': f'https://www.enamor.co.in/search?q={query_term}',
+    'amante': f'https://www.amantelingerie.com/search?q={query_term}',
+
+    # E-commerce platforms after brand stores
+    'amazon': f'https://www.amazon.in/s?k={query_term}',
+    'flipkart': f'https://www.flipkart.com/search?q={query_term}',
+    'myntra': f'https://www.myntra.com/search?q={query_term}',
+}
+
 
     response = {
         'product_name': product_name,
