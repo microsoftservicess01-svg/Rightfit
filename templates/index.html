@@ -1,124 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <head>
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2DGBRSRF52"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-2DGBRSRF52');
-    </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
+
+  <!-- Tailwind CDN (optional) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background: linear-gradient(180deg, #071426, #0f2b3a); color: #fff; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    .card { background: #fff; color: #0b1220; border-radius: 14px; box-shadow: 0 18px 36px rgba(2,6,23,0.45); }
-    .theme-toggle { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 8px; cursor: pointer; color: #e6eef7; font-weight:700; }
-    .chip { background: rgba(2,6,23,0.04); border-radius: 10px; padding:6px 10px; font-weight:700; color:#0b1220; }
-  </style>
-    <style>
-/* === Animated Bra Logo Loader === */
 
-#animated-global-loader {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999999;
-  transition: opacity 400ms ease, visibility 400ms ease;
-}
+  <!-- Local stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
-#animated-global-loader.fade-out {
-  opacity: 0;
-  visibility: hidden;
-}
-
-#animated-global-loader .loader-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-}
-
-#animated-global-loader svg {
-  width: 110px;
-  height: 110px;
-}
-
-/* Cup pulse */
-@keyframes cupPulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.06); }
-  100% { transform: scale(1); }
-}
-.bra-cup {
-  animation: cupPulse 1.4s ease-in-out infinite;
-}
-
-/* Stroke draw */
-@keyframes strokeDraw {
-  0% { stroke-dashoffset: 1000; }
-  100% { stroke-dashoffset: 0; }
-}
-.bra-strap, .bra-outline {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: strokeDraw 1.1s ease forwards;
-}
-
-/* Sparkle */
-@keyframes sparkle {
-  0%   { opacity: 0; transform: translateY(0) scale(0.8); }
-  40%  { opacity: 1; transform: translateY(-6px) scale(1.05); }
-  100% { opacity: 0; transform: translateY(-12px) scale(0.9); }
-}
-.bra-spark {
-  animation: sparkle 1.3s ease-in-out infinite;
-}
-
-/* Text */
-.loader-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: #154273;
-  font-family: system-ui, sans-serif;
-}
-</style>
-    
 </head>
 <body class="p-4">
-  <body>
-<!-- Animated Logo Loader -->
+
+<!-- Animated Loader -->
 <div id="animated-global-loader">
   <div class="loader-inner">
-
-    <!-- SVG Bra Logo -->
+    <!-- Minimal inline SVG bra -->
     <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg">
-      <!-- Left cup -->
       <g class="bra-cup" transform="translate(36, 36)">
         <path d="M24 44 C4 40, 2 20, 24 12 C46 4, 70 16, 74 36 C74 44, 56 56, 36 54 C30 54, 26 48, 24 44 Z"
               fill="#FAD3E0" stroke="#E16A9E" stroke-width="2" />
       </g>
-      <!-- Right cup -->
       <g class="bra-cup" transform="translate(110, 36)">
         <path d="M24 44 C4 40, 2 20, 24 12 C46 4, 70 16, 74 36 C74 44, 56 56, 36 54 C30 54, 26 48, 24 44 Z"
               fill="#FAD3E0" stroke="#E16A9E" stroke-width="2" />
       </g>
-      <!-- Strap -->
       <path class="bra-strap" d="M70 48 C90 26, 130 26, 150 48"
             fill="none" stroke="#3A6EA5" stroke-width="6" stroke-linecap="round"/>
-      <!-- Outline -->
       <path class="bra-outline" d="M18 70 C46 84, 62 94, 104 98 C146 94, 162 84, 190 70"
             fill="none" stroke="#203B5A" stroke-width="4" stroke-linecap="round"/>
-      <!-- Sparkle -->
       <circle class="bra-spark" cx="110" cy="26" r="4" fill="#FFD66B"/>
     </svg>
 
@@ -126,230 +38,211 @@
   </div>
 </div>
 
-
-  <header class="mb-6 max-w-3xl mx-auto">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-extrabold">RightFit</h1>
-        <p class="text-sm text-slate-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div id="aiMode" class="chip" title="Use custom AI studio image">AI sample</div>
-        <button id="darkToggle" class="theme-toggle" title="Toggle darker sample">Dark sample</button>
-      </div>
+<header class="mb-6 max-w-3xl mx-auto">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold">RightFit</h1>
+      <p class="text-sm text-slate-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
     </div>
-  </header>
-
-  <main class="max-w-3xl mx-auto">
-
-    <!-- FORM CARD -->
-    <section class="card p-6">
-      <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
-
-      <div class="space-y-3">
-        <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
-        <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
-        <select id="activityInput" class="w-full p-3 rounded-lg border">
-          <option>Daily / Casual</option>
-          <option>Sports / Active</option>
-          <option>High Impact</option>
-        </select>
-        <select id="rootInput" class="w-full p-3 rounded-lg border">
-          <option>Narrow</option>
-          <option>Average</option>
-          <option>Wide</option>
-        </select>
-      </div>
-
-      <div class="mt-4 flex gap-3">
-        <button id="searchBtn" class="flex-1 py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white">Search</button>
-        <button id="resetBtn" class="py-3 px-4 rounded-lg font-semibold bg-white/10">Reset</button>
-      </div>
-    </section>
-
-<!-- RESULTS CARD (updated to include brand buttons) -->
-<section id="resultsCard" class="card p-6 mt-6 hidden">
-  <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
-
-  <div class="flex justify-center mb-4">
-    <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
+    <div class="flex items-center gap-3">
+      <div id="aiMode" class="chip" title="Use custom AI studio image">AI sample</div>
+      <button id="darkToggle" class="theme-toggle" title="Toggle darker sample">Dark sample</button>
+    </div>
   </div>
+</header>
 
-  <div class="text-slate-700 mb-4">
-    <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
-    <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
-    <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
-  </div>
+<main class="max-w-3xl mx-auto">
 
-  <!-- store buttons: Indian brands FIRST, marketplaces after -->
-  <div class="store-stack flex flex-wrap gap-3" aria-label="Store links">
-    <!-- Indian brands (may be hidden if backend doesn't provide) -->
-    <a id="zivameBtn" class="store-btn zivame py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Zivame</a>
-    <a id="cloviaBtn" class="store-btn clovia py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Clovia</a>
-    <a id="shyawayBtn" class="store-btn shyaway py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Shyaway</a>
-    <a id="enamorBtn" class="store-btn enamor py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Enamor</a>
-    <a id="amanteBtn" class="store-btn amante py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amante</a>
+  <!-- FORM CARD -->
+  <section class="card p-6">
+    <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
+    <div class="space-y-3">
+      <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
+      <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
+      <select id="activityInput" class="w-full p-3 rounded-lg border">
+        <option>Daily / Casual</option>
+        <option>Sports / Active</option>
+        <option>High Impact</option>
+      </select>
+      <select id="rootInput" class="w-full p-3 rounded-lg border">
+        <option>Narrow</option>
+        <option>Average</option>
+        <option>Wide</option>
+      </select>
+    </div>
 
-    <!-- Marketplaces -->
-    <a id="amazonBtn" class="store-btn amazon py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amazon</a>
-    <a id="flipkartBtn" class="store-btn flipkart py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Flipkart</a>
-    <a id="myntraBtn" class="store-btn myntra py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Myntra</a>
-  </div>
-</section>
+    <div class="mt-4 flex gap-3">
+      <button id="searchBtn" class="flex-1 py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white">Search</button>
+      <button id="resetBtn" class="py-3 px-4 rounded-lg font-semibold bg-white/10">Reset</button>
+    </div>
+  </section>
 
+  <!-- RESULTS CARD (updated to include brand buttons) -->
+  <section id="resultsCard" class="card p-6 mt-6 hidden">
+    <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
 
-  </main>
+    <div class="flex justify-center mb-4">
+      <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
+    </div>
 
-  <script>
-    /*******************************
-     *  Sample image sources (stable)
-     *
-     *  These are stable Unsplash product images suitable as product-only studio shots.
-     *  You can replace any URL here with your own image (AI-generated or hosted).
-     *******************************/
+    <div class="text-slate-700 mb-4">
+      <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
+      <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
+      <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
+    </div>
 
-    // Daily / Casual (T-shirt / everyday)
-    const UNSPLASH_DAILY = "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&w=1200&q=80";
+    <!-- store buttons: Indian brands FIRST, marketplaces after -->
+    <div class="store-stack flex flex-wrap gap-3" aria-label="Store links">
+      <!-- Indian brands (hidden by default; shown by JS if present) -->
+      <a id="zivameBtn" class="store-btn zivame py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Zivame</a>
+      <a id="cloviaBtn" class="store-btn clovia py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Clovia</a>
+      <a id="shyawayBtn" class="store-btn shyaway py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Shyaway</a>
+      <a id="enamorBtn" class="store-btn enamor py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Enamor</a>
+      <a id="amanteBtn" class="store-btn amante py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amante</a>
 
-    // Sports (sports-bra-like product shot)
-    const UNSPLASH_SPORTS = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&w=1200&q=80";
+      <!-- Marketplaces -->
+      <a id="amazonBtn" class="store-btn amazon py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amazon</a>
+      <a id="flipkartBtn" class="store-btn flipkart py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Flipkart</a>
+      <a id="myntraBtn" class="store-btn myntra py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Myntra</a>
+    </div>
+  </section>
 
-    // High-impact (supportive product shot)
-    const UNSPLASH_HIGHIMPACT = "https://images.unsplash.com/photo-1593032465178-3f2f8b3f2f4f?auto=format&w=1200&q=80";
+</main>
 
-    // Darker-themed sample (for 'Dark sample' toggle) - higher contrast studio
-    const UNSPLASH_DARK_SAMPLE = "https://images.unsplash.com/photo-1557682250-ffe0f1659a77?auto=format&w=1200&q=80";
+<script>
+  // Sample images (fallbacks)
+  const UNSPLASH_DAILY = "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&w=1200&q=80";
+  const UNSPLASH_SPORTS = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&w=1200&q=80";
+  const UNSPLASH_HIGHIMPACT = "https://images.unsplash.com/photo-1593032465178-3f2f8b3f2f4f?auto=format&w=1200&q=80";
+  const UNSPLASH_DARK_SAMPLE = "https://images.unsplash.com/photo-1557682250-ffe0f1659a77?auto=format&w=1200&q=80";
+  const AI_STUDIO_SAMPLE = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&w=1200&q=80";
 
-    // AI studio product shot placeholder (replace with your generated AI image URL)
-    const AI_STUDIO_SAMPLE = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&w=1200&q=80";
+  const ACTIVITY_MAP = {
+    "Daily / Casual": UNSPLASH_DAILY,
+    "Sports / Active": UNSPLASH_SPORTS,
+    "High Impact": UNSPLASH_HIGHIMPACT
+  };
 
-    // Mapping by activity label used in form
-    const ACTIVITY_MAP = {
-      "Daily / Casual": UNSPLASH_DAILY,
-      "Sports / Active": UNSPLASH_SPORTS,
-      "High Impact": UNSPLASH_HIGHIMPACT
-    };
+  let useDarkSample = false;
+  let useAiSample = false;
 
-    // UI state
-    let useDarkSample = false;
-    let useAiSample = false;
+  const darkToggle = document.getElementById("darkToggle");
+  const aiMode = document.getElementById("aiMode");
+  const searchBtn = document.getElementById("searchBtn");
+  const resetBtn = document.getElementById("resetBtn");
 
-    // Elements
-    const darkToggle = document.getElementById("darkToggle");
-    const aiMode = document.getElementById("aiMode");
-    const searchBtn = document.getElementById("searchBtn");
-    const resetBtn = document.getElementById("resetBtn");
+  darkToggle.addEventListener("click", () => {
+    useDarkSample = !useDarkSample;
+    darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
+    darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
+  });
 
-    // Toggle dark sample
-    darkToggle.addEventListener("click", () => {
-      useDarkSample = !useDarkSample;
-      darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
-      darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
-    });
+  aiMode.addEventListener("click", () => {
+    useAiSample = !useAiSample;
+    aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
+    aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
+  });
 
-    // Toggle AI sample (click the small chip)
-    aiMode.addEventListener("click", () => {
-      useAiSample = !useAiSample;
-      aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
-      aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
-    });
+  function pickSample(activityLabel) {
+    if (useAiSample) return AI_STUDIO_SAMPLE;
+    if (useDarkSample) return UNSPLASH_DARK_SAMPLE;
+    return ACTIVITY_MAP[activityLabel] || UNSPLASH_DAILY;
+  }
 
-    // Helper to pick fallback sample based on activity & toggles
-    function pickSample(activityLabel) {
-      if (useAiSample) return AI_STUDIO_SAMPLE;
-      if (useDarkSample) return UNSPLASH_DARK_SAMPLE;
-      return ACTIVITY_MAP[activityLabel] || UNSPLASH_DAILY;
+  // Helper to set an anchor href and show/hide it
+  function setStoreLink(id, url, fallback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const href = url || fallback || "#";
+    if (href && href !== "#") {
+      el.href = href;
+      el.style.display = ""; // show
+    } else {
+      el.style.display = "none"; // hide if no url
     }
+  }
 
-    // Main search action
-    searchBtn.addEventListener("click", async () => {
-      const band = parseFloat(document.getElementById("bandInput").value) || 78;
-      const bust = parseFloat(document.getElementById("bustInput").value) || 90;
-      const activity = document.getElementById("activityInput").value || "Daily / Casual";
-      const root = document.getElementById("rootInput").value || "Narrow";
+  searchBtn.addEventListener("click", async () => {
+    const band = parseFloat(document.getElementById("bandInput").value) || 78;
+    const bust = parseFloat(document.getElementById("bustInput").value) || 90;
+    const activity = document.getElementById("activityInput").value || "Daily / Casual";
+    const root = document.getElementById("rootInput").value || "Narrow";
 
-      searchBtn.disabled = true;
-      searchBtn.textContent = "Searching...";
+    searchBtn.disabled = true;
+    searchBtn.textContent = "Searching...";
 
-      try {
-        const res = await fetch("/api/results", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ band, bust, activity, root })
-        });
+    try {
+      const res = await fetch("/api/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ band, bust, activity, root })
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        // Use backend image if provided and it looks like a URL; else use selected sample
-        let imgUrl = null;
-        if (data.images && data.images.length > 0) {
-          const candidate = data.images[0];
-          // treat tiny svg data URIs as "no image"
-          if (typeof candidate === "string" && candidate.length > 40 && !candidate.startsWith("data:image/svg+xml")) {
-            imgUrl = candidate;
-          }
+      // Determine image to use
+      let imgUrl = null;
+      if (data.images && data.images.length > 0) {
+        const candidate = data.images[0];
+        if (typeof candidate === "string" && candidate.length > 40 && !candidate.startsWith("data:image/svg+xml")) {
+          imgUrl = candidate;
         }
-        if (!imgUrl) {
-          imgUrl = pickSample(activity);
-        }
-
-        // Set UI values
-        document.getElementById("resultImage").src = imgUrl;
-        document.getElementById("productName").textContent = data.product_name || ("Comfort " + (Math.round(band/5)*5) + "X");
-        document.getElementById("bandVal").textContent = data.band || band;
-        document.getElementById("bustVal").textContent = data.bust || bust;
-        document.getElementById("cupVal").textContent = data.cup_diff ?? Math.round((bust-band)) ;
-
-        // store links (backend returns them; build fallbacks if not present)
-        document.getElementById("amazonBtn").href = data.store_urls?.amazon || `https://www.amazon.in/s?k=${encodeURIComponent(data.product_name||"bra")}`;
-        document.getElementById("flipkartBtn").href = data.store_urls?.flipkart || `https://www.flipkart.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
-        document.getElementById("myntraBtn").href = data.store_urls?.myntra || `https://www.myntra.com/search?q=${encodeURIComponent(data.product_name||"bra")}`;
-
-        document.getElementById("resultsCard").classList.remove("hidden");
-        setTimeout(()=> window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" }), 120);
-
-      } catch (err) {
-        console.error("Error fetching results:", err);
-        alert("Could not fetch results — try again.");
-      } finally {
-        searchBtn.disabled = false;
-        searchBtn.textContent = "Search";
       }
-    });
+      if (!imgUrl) {
+        imgUrl = pickSample(activity);
+      }
 
-    resetBtn.addEventListener("click", () => {
-      document.getElementById("bandInput").value = 78;
-      document.getElementById("bustInput").value = 90;
-      document.getElementById("activityInput").value = "Daily / Casual";
-      document.getElementById("rootInput").value = "Narrow";
-      document.getElementById("resultsCard").classList.add("hidden");
-    });
-  </script>
-    <script>
-window.addEventListener("load", function () {
-  const loader = document.getElementById("animated-global-loader");
-  if (!loader) return;
+      // update UI
+      document.getElementById("resultImage").src = imgUrl;
+      document.getElementById("productName").textContent = data.product_name || ("Comfort " + Math.round(band));
+      document.getElementById("bandVal").textContent = data.band || band;
+      document.getElementById("bustVal").textContent = data.bust || bust;
+      document.getElementById("cupVal").textContent = data.cup_diff ?? Math.round((bust - band));
 
-  loader.classList.add("fade-out");
+      // build a readable query for fallback searches
+      const nameForQuery = encodeURIComponent(data.product_name || (Math.round(band) + " bra"));
 
-  setTimeout(() => {
-    if (loader && loader.parentNode) {
-      loader.remove();
+      // set brand links (Indian brands first)
+      setStoreLink("zivameBtn", data.store_urls?.zivame, `https://www.zivame.com/catalogsearch/result/?q=${nameForQuery}`);
+      setStoreLink("cloviaBtn", data.store_urls?.clovia, `https://www.clovia.com/search/?q=${nameForQuery}`);
+      setStoreLink("shyawayBtn", data.store_urls?.shyaway, `https://www.shyaway.com/catalogsearch/result/?q=${nameForQuery}`);
+      setStoreLink("enamorBtn", data.store_urls?.enamor, `https://www.enamor.co.in/search?q=${nameForQuery}`);
+      setStoreLink("amanteBtn", data.store_urls?.amante, `https://www.amantelingerie.com/search?q=${nameForQuery}`);
+
+      // marketplaces
+      setStoreLink("amazonBtn", data.store_urls?.amazon, `https://www.amazon.in/s?k=${nameForQuery}`);
+      setStoreLink("flipkartBtn", data.store_urls?.flipkart, `https://www.flipkart.com/search?q=${nameForQuery}`);
+      setStoreLink("myntraBtn", data.store_urls?.myntra, `https://www.myntra.com/search?q=${nameForQuery}`);
+
+      document.getElementById("resultsCard").classList.remove("hidden");
+      setTimeout(()=> window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" }), 120);
+
+    } catch (err) {
+      console.error("Error fetching results:", err);
+      alert("Could not fetch results — try again.");
+    } finally {
+      searchBtn.disabled = false;
+      searchBtn.textContent = "Search";
     }
-  }, 450);
-});
-    </script>
-    
-</body>
-  <!-- START: top-banner -->
-<div id="top-banner" class="top-banner" role="region" aria-label="Special offer">
-  <div class="top-banner__marquee" id="topMarquee">
-    <span class="top-banner__text"> ....🎁Chance for free ₹200 gift voucher🎁....</span>
-    <a class="top-banner__cta" href="https://spinwheel-aoae.onrender.com" target="_blank" rel="noopener noreferrer">Click here</a>
-  </div>
-  <button id="topBannerClose" class="top-banner__close" aria-label="Close banner">&times;</button>
-</div>
-<!-- END: top-banner -->
+  });
 
+  resetBtn.addEventListener("click", () => {
+    document.getElementById("bandInput").value = 78;
+    document.getElementById("bustInput").value = 90;
+    document.getElementById("activityInput").value = "Daily / Casual";
+    document.getElementById("rootInput").value = "Narrow";
+    document.getElementById("resultsCard").classList.add("hidden");
+  });
+
+  // Loader fade-out
+  window.addEventListener("load", function () {
+    const loader = document.getElementById("animated-global-loader");
+    if (!loader) return;
+    loader.classList.add("fade-out");
+    setTimeout(() => { if (loader && loader.parentNode) loader.remove(); }, 450);
+  });
+
+</script>
+
+</body>
 </html>
