@@ -1,0 +1,76 @@
+/* static/css/banner.css */
+:root {
+  --banner-bg: #1a73e8;
+  --banner-text: #fff;
+  --banner-cta-bg: #fff;
+  --banner-cta-color: #1a73e8;
+}
+
+.top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: var(--banner-bg);
+  color: var(--banner-text);
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  gap: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* marquee area (flex grows) */
+.top-banner__marquee {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  flex: 1;
+  gap: 16px;
+}
+
+/* the scrolling text */
+.top-banner__text {
+  display: inline-block;
+  padding-right: 40px;
+  animation: slideLeft 12s linear infinite;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* CTA button */
+.top-banner__cta {
+  background: var(--banner-cta-bg);
+  color: var(--banner-cta-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+/* close button */
+.top-banner__close {
+  background: transparent;
+  color: var(--banner-text);
+  border: 0;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+/* marquee animation */
+@keyframes slideLeft {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* responsive smaller screens */
+@media (max-width: 520px) {
+  .top-banner__text { font-size: 14px; animation-duration: 14s; }
+  .top-banner__cta { padding: 6px 8px; font-size: 13px; }
+}
