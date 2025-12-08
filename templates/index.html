@@ -168,26 +168,36 @@
       </div>
     </section>
 
-    <!-- RESULTS CARD -->
-    <section id="resultsCard" class="card p-6 mt-6 hidden">
-      <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
+<!-- RESULTS CARD (updated to include brand buttons) -->
+<section id="resultsCard" class="card p-6 mt-6 hidden">
+  <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
 
-      <div class="flex justify-center mb-4">
-        <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
-      </div>
+  <div class="flex justify-center mb-4">
+    <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
+  </div>
 
-      <div class="text-slate-700 mb-4">
-        <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
-        <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
-        <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
-      </div>
+  <div class="text-slate-700 mb-4">
+    <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
+    <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
+    <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
+  </div>
 
-      <div class="flex gap-3">
-        <a id="amazonBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#ff9900] text-white" target="_blank" rel="noopener">View on Amazon</a>
-        <a id="flipkartBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#2874f0] text-white" target="_blank" rel="noopener">View on Flipkart</a>
-        <a id="myntraBtn" class="flex-1 py-3 rounded-lg text-center font-bold bg-[#e83f6f] text-white" target="_blank" rel="noopener">View on Myntra</a>
-      </div>
-    </section>
+  <!-- store buttons: Indian brands FIRST, marketplaces after -->
+  <div class="store-stack flex flex-wrap gap-3" aria-label="Store links">
+    <!-- Indian brands (may be hidden if backend doesn't provide) -->
+    <a id="zivameBtn" class="store-btn zivame py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Zivame</a>
+    <a id="cloviaBtn" class="store-btn clovia py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Clovia</a>
+    <a id="shyawayBtn" class="store-btn shyaway py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Shyaway</a>
+    <a id="enamorBtn" class="store-btn enamor py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Enamor</a>
+    <a id="amanteBtn" class="store-btn amante py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amante</a>
+
+    <!-- Marketplaces -->
+    <a id="amazonBtn" class="store-btn amazon py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amazon</a>
+    <a id="flipkartBtn" class="store-btn flipkart py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Flipkart</a>
+    <a id="myntraBtn" class="store-btn myntra py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Myntra</a>
+  </div>
+</section>
+
 
   </main>
 
