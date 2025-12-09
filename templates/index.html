@@ -222,8 +222,8 @@
       searchBtn.disabled = true;
       searchBtn.textContent = 'Searching...';
 
-      const bandRaw = parseFloat(document.getElementById("bandInput").value) || 78;
-      const bustRaw = parseFloat(document.getElementById("bustInput").value) || 90;
+      const bandRaw = parseFloat(document.getElementById("bandInput").value) || 00;
+      const bustRaw = parseFloat(document.getElementById("bustInput").value) || 00;
       const activity = document.getElementById("activityInput").value || "Daily / Casual";
       const root = document.getElementById("rootInput").value || "Narrow";
 
@@ -293,8 +293,8 @@
     });
 
     resetBtn.addEventListener('click', (e)=>{ e.preventDefault();
-      document.getElementById("bandInput").value = 78;
-      document.getElementById("bustInput").value = 90;
+      document.getElementById("bandInput").value = 00;
+      document.getElementById("bustInput").value = 00;
       document.getElementById("activityInput").value = "Daily / Casual";
       document.getElementById("rootInput").value = "Narrow";
       document.getElementById("resultsCard").classList.add('hidden');
