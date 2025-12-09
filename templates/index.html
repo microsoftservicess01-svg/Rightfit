@@ -203,11 +203,11 @@
       const nameForQuery = encodeURIComponent(data.product_name || (Math.round(band) + " bra"));
 
       // set brand links (Indian brands first)
-      setStoreLink("zivameBtn", data.store_urls?.zivame, `https://www.zivame.com/catalogsearch/result/?q=${nameForQuery}`);
-      setStoreLink("cloviaBtn", data.store_urls?.clovia, `https://www.clovia.com/search/?q=${nameForQuery}`);
-      setStoreLink("shyawayBtn", data.store_urls?.shyaway, `https://www.shyaway.com/catalogsearch/result/?q=${nameForQuery}`);
-      setStoreLink("enamorBtn", data.store_urls?.enamor, `https://www.enamor.co.in/search?q=${nameForQuery}`);
-      setStoreLink("amanteBtn", data.store_urls?.amante, `https://www.amantelingerie.com/search?q=${nameForQuery}`);
+      safeStoreLink("zivameBtn",  data.store_urls?.zivame,  `https://www.zivame.com/search?q=${nameForQuery}`);
+      safeStoreLink("cloviaBtn",  data.store_urls?.clovia,  `https://www.clovia.com/search/?q=${nameForQuery}`);
+      safeStoreLink("shyawayBtn", data.store_urls?.shyaway, `https://www.shyaway.com/catalogsearch/result/?q=${nameForQuery}`);
+      safeStoreLink("enamorBtn",  data.store_urls?.enamor,  `https://www.enamor.co.in/search?q=${nameForQuery}`);
+      safeStoreLink("amanteBtn",  data.store_urls?.amante,  `https://www.amantelingerie.com/search?q=${nameForQuery}`);
 
       // marketplaces
       setStoreLink("amazonBtn", data.store_urls?.amazon, `https://www.amazon.in/s?k=${nameForQuery}`);
