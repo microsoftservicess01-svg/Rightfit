@@ -393,12 +393,12 @@
       const nameForQuery = encodeURIComponent(fallbackName);
 
       // set brand links (override fallback for Indian brands, but keep DB links if present)
-      setStoreLink("zivameBtn",  data.store_urls?.zivame,  `https://www.zivame.com/search?q=${nameForQuery}`);
-      setStoreLink("cloviaBtn",  data.store_urls?.clovia,  `https://www.clovia.com/search/?q=${nameForQuery}`);
-      setStoreLink("shyawayBtn", data.store_urls?.shyaway, `https://www.shyaway.com/catalogsearch/result/?q=${nameForQuery}`);
-      setStoreLink("enamorBtn",  data.store_urls?.enamor,  `https://www.enamor.co.in/search?q=${nameForQuery}`);
-      setStoreLink("amanteBtn",  data.store_urls?.amante,  `https://www.amantelingerie.com/search?q=${nameForQuery}`);
-
+      setStoreLink("zivameBtn",  data.store_urls?.zivame || null, null);
+      setStoreLink("cloviaBtn",  data.store_urls?.clovia || null, null);
+      setStoreLink("shyawayBtn", data.store_urls?.shyaway || null, null);
+      setStoreLink("enamorBtn",  data.store_urls?.enamor || null, null);
+      setStoreLink("amanteBtn",  data.store_urls?.amante || null, null);
+      
       // marketplaces (do NOT override with fallback) — only show if DB link present
       setStoreLink("amazonBtn", data.store_urls?.amazon || null, null);
       setStoreLink("flipkartBtn", data.store_urls?.flipkart || null, null);
@@ -441,4 +441,3 @@
   </script>
 </body>
 </html>
-
