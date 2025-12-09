@@ -254,12 +254,11 @@
       notesArea.textContent = local.notes.join(' • ');
 
       // set brand links using only backend URLs (no fallbacks)
-      setStoreLink("zivameBtn",  data.store_urls?.zivame || null);
-      setStoreLink("cloviaBtn",  data.store_urls?.clovia || null);
-      setStoreLink("shyawayBtn", data.store_urls?.shyaway || null);
-      setStoreLink("enamorBtn",  data.store_urls?.enamor || null);
-      setStoreLink("amanteBtn",  data.store_urls?.amante || null);
-
+      setStoreLink("zivameBtn",  "https://www.zivame.com");
+      setStoreLink("cloviaBtn",  "https://www.clovia.com");
+      setStoreLink("shyawayBtn", "https://www.shyaway.com");
+      setStoreLink("enamorBtn",  "https://www.enamor.co.in");
+      setStoreLink("amanteBtn",  "https://www.amantelingerie.com");
       setStoreLink("amazonBtn",  data.store_urls?.amazon || null);
       setStoreLink("flipkartBtn", data.store_urls?.flipkart || null);
       setStoreLink("myntraBtn",  data.store_urls?.myntra || null);
