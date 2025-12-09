@@ -5,65 +5,73 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
   <style>
-    /* Minimal inline styles to match your layout and keep the example self-contained.
-       Replace with your real site CSS if you have one. */
-    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background: linear-gradient(#071227,#042034); color:#fff; min-height:100vh; }
-    .container { max-width:920px; margin:32px auto; padding:0 16px; }
-    .card { background:#0b1420; border-radius:10px; box-shadow:0 8px 28px rgba(2,6,23,0.6); padding:18px; color:#e6eef8; }
-    .p-6 { padding: 1.5rem; }
-    .text-lg { font-size:1.125rem; }
-    .font-bold { font-weight:700; }
-    .mb-4 { margin-bottom:1rem; }
-    .space-y-3 > * + * { margin-top: .75rem; }
-    input[type="number"], select { width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; }
-    button { padding:10px 18px; border-radius:8px; border:none; cursor:pointer; }
-    .primary { background:#2b6ef6; color:white; }
-    .muted { background:rgba(255,255,255,0.04); color:#dbeafe; }
-    .btn-row { display:flex; gap:10px; margin-top:12px; align-items:center; }
-    .brands { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
-    .brand-btn { display:inline-block; padding:10px 12px; border-radius:8px; text-decoration:none; color:#fff; font-weight:600; }
-    .hidden { display:none; }
-    #resultImage { width:100%; max-width:160px; border-radius:8px; background:#0f1724; display:block; margin-bottom:8px; }
-    #resultsCard .card { margin-top:18px; }
-    .small { font-size:0.9rem; color:#bcd3f0; }
-    .disabled { opacity:0.4; pointer-events:none; }
-    .top-banner { position: fixed; left: 12px; bottom: 12px; background: rgba(0,0,0,0.6); padding: 10px 12px; border-radius: 8px; display:flex; gap:10px; align-items:center; z-index: 9999; }
-    .top-banner__cta { background:#10b981; padding:6px 10px; border-radius:6px; color:#041024; text-decoration:none; font-weight:700; }
-    .top-banner__close { background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; }
-    .loader { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); z-index:9998; }
-    .fade-out { opacity:0; transition: opacity .45s ease; }
-    .chip { background: rgba(255,255,255,0.04); padding:6px 10px; border-radius:999px; color:#e6eef8; }
-    pre { background: rgba(0,0,0,0.25); padding:10px; overflow:auto; border-radius:8px; color:#dbeafe; }
+    :root{
+      --bg-1:#071227; --bg-2:#042034; --card:#0b1420; --muted:rgba(255,255,255,0.06);
+      --accent:#2b6ef6; --ok:#10b981; --danger:#ef4444;
+    }
+    html,body{height:100%;}
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background: linear-gradient(180deg,var(--bg-1),var(--bg-2)); color:#e6eef8; min-height:100vh; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .container { max-width:920px; margin:32px auto; padding:0 16px 140px; box-sizing:border-box; }
+    header{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px;}
+    h1{margin:0;font-size:1.15rem}
+    .small { font-size:0.92rem;color:#bcd3f0; }
+
+    .card{background:var(--card); border-radius:12px; padding:18px; box-shadow:0 8px 28px rgba(2,6,23,0.6);}
+    .p-6{padding:1.5rem;}
+    input[type="number"], select{width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--muted); background:transparent; color:inherit; box-sizing:border-box;}
+    .btn-row{display:flex; gap:10px; align-items:center; margin-top:12px;}
+    button{padding:10px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600;}
+    .primary{background:var(--accent); color:#fff;}
+    .muted{background:transparent; border:1px solid var(--muted); color:#dbeafe;}
+    .chip{background:rgba(255,255,255,0.03); padding:6px 10px; border-radius:999px; color:#cfe6ff;}
+    .brands{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+    .brand-btn{display:inline-flex; align-items:center; justify-content:center; min-width:84px; padding:8px 10px; border-radius:10px; text-decoration:none; color:#fff; font-weight:700; font-size:0.88rem;}
+    .brand-btn.small{min-width:72px; font-size:0.82rem; padding:6px 8px;}
+    .hidden{display:none;}
+    #resultImage{width:120px; height:120px; object-fit:cover; border-radius:8px; background:#0f1724; flex:0 0 120px;}
+    #resultsCard .card{margin-top:18px;}
+    .result-main{display:flex; gap:16px; align-items:flex-start;}
+    .result-meta{flex:1;}
+    .notes{margin-top:8px; color:#cfe6ff; font-size:0.95rem;}
+    pre{background:rgba(0,0,0,0.28); padding:10px; overflow:auto; border-radius:8px; color:#dbeafe; margin:0;}
+    .debug-hidden{display:none !important;}
+    @media (max-width:720px){
+      .result-main{flex-direction:column; align-items:center;}
+      #resultImage{width:100%; height:160px; flex:0 0 auto;}
+      .brand-btn{min-width:72px; font-size:0.82rem; padding:8px;}
+    }
+    .sr-only{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;}
+    body:after{content:""; display:block; height:100px;}
+    /* Highlighted bra-size styles */
+    .size-head { font-size:1.25rem; font-weight:800; color:#fff; background: linear-gradient(90deg, rgba(43,110,246,0.12), rgba(124,58,237,0.06)); padding:10px 14px; border-radius:10px; display:inline-block; }
+    .size-sub { margin-top:8px; color:#dbeafe; font-weight:600; }
   </style>
 </head>
 <body>
-  <!-- loader (will fade) -->
-  <div id="animated-global-loader" class="loader"><div class="card p-6">Loading…</div></div>
-
   <div class="container">
-    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <header>
       <div>
-        <h1 style="margin:0; font-size:1.25rem;">RightFit</h1>
+        <h1>RightFit</h1>
         <div class="small">The Smart Way to Choose Your Perfect Fit</div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
-        <button id="darkToggle" class="muted">Dark sample</button>
-        <button id="aiMode" class="muted">AI sample</button>
+        <button id="darkToggle" class="muted small">Dark sample</button>
+        <button id="aiMode" class="muted small">AI sample</button>
       </div>
     </header>
 
-    <!-- FORM CARD -->
-    <section class="card p-6">
-      <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
-      <div class="space-y-3">
-        <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
-        <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
-        <select id="activityInput" class="w-full p-3 rounded-lg border">
+    <!-- form -->
+    <section class="card p-6" aria-labelledby="form-title">
+      <h2 id="form-title" class="text-lg" style="margin:0 0 .5rem 0">Get Your Recommendation</h2>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <input id="bandInput" type="number" placeholder="Underbust (band) cm" value="78" aria-label="Band underbust in cm">
+        <input id="bustInput" type="number" placeholder="Full bust (bust) cm" value="90" aria-label="Bust full bust in cm">
+        <select id="activityInput" aria-label="Activity preference">
           <option>Daily / Casual</option>
           <option>Sports / Active</option>
           <option>High Impact</option>
         </select>
-        <select id="rootInput" class="w-full p-3 rounded-lg border">
+        <select id="rootInput" aria-label="Root width">
           <option>Narrow</option>
           <option>Average</option>
           <option>Wide</option>
@@ -72,241 +80,137 @@
         <div class="btn-row">
           <button id="searchBtn" class="primary">Search</button>
           <button id="resetBtn" class="muted">Reset</button>
-          <span id="statusChip" class="chip" style="margin-left:auto;">Ready</span>
+          <span id="statusChip" class="chip" style="margin-left:auto">Ready</span>
         </div>
       </div>
     </section>
 
-    <!-- RESULTS -->
-    <section id="resultsCard" class="card p-6 hidden">
-      <div style="display:flex; gap:18px; align-items:flex-start;">
-        <img id="resultImage" src="" alt="Product sample" />
-        <div style="flex:1;">
-          <h3 id="productName" style="margin:0 0 6px 0;">Comfort</h3>
-          <div class="small">Band: <span id="bandVal">--</span> &nbsp; | &nbsp; Bust: <span id="bustVal">--</span> &nbsp; | &nbsp; Cup: <span id="cupVal">--</span></div>
-          <div id="notesArea" class="small" style="margin-top:8px;"></div>
+    <!-- results (simplified) -->
+    <section id="resultsCard" class="card p-6 hidden" aria-live="polite">
+      <div class="result-main" style="align-items:flex-start;">
+        <!-- compact image kept but small and not labeled -->
+        <img id="resultImage" src="" alt="" class="sr-only" style="width:1px;height:1px;opacity:0;"/>
+        <div class="result-meta">
+          <!-- PROMINENT BRA SIZE ONLY -->
+          <div id="sizeHeadline" class="size-head">Comfort 78 — Daily / Casual</div>
+          <!-- concise meta under the headline -->
+          <div id="sizeMeta" class="size-sub">Band: <strong id="bandVal">--</strong> &nbsp; | &nbsp; Bust: <strong id="bustVal">--</strong> &nbsp; | &nbsp; Cup: <strong id="cupVal">--</strong></div>
 
-          <div class="brands" style="margin-top:12px;">
-            <a id="zivameBtn" class="brand-btn" style="background:#ff6b6b">View on Zivame</a>
-            <a id="cloviaBtn" class="brand-btn" style="background:#ff73a0">View on Clovia</a>
-            <a id="shyawayBtn" class="brand-btn" style="background:#ff5fb7">View on Shyaway</a>
-            <a id="enamorBtn" class="brand-btn" style="background:#7c3aed">View on Enamor</a>
-            <a id="amanteBtn" class="brand-btn" style="background:#f97316">View on Amante</a>
+          <!-- notes kept short -->
+          <div id="notesArea" class="notes" aria-hidden="false"></div>
 
-            <a id="amazonBtn" class="brand-btn" style="background:#f59e0b">View on Amazon</a>
-            <a id="flipkartBtn" class="brand-btn" style="background:#0369a1">View on Flipkart</a>
-            <a id="myntraBtn" class="brand-btn" style="background:#ec4899">View on Myntra</a>
+          <!-- brand buttons -->
+          <div class="brands" id="brandButtons" style="margin-top:12px;">
+            <a id="zivameBtn" class="brand-btn" style="background:#ff6b6b">Zivame</a>
+            <a id="cloviaBtn" class="brand-btn" style="background:#ff73a0">Clovia</a>
+            <a id="shyawayBtn" class="brand-btn" style="background:#ff5fb7">Shyaway</a>
+            <a id="enamorBtn" class="brand-btn" style="background:#7c3aed">Enamor</a>
+            <a id="amanteBtn" class="brand-btn" style="background:#f97316">Amante</a>
+
+            <a id="amazonBtn" class="brand-btn small" style="background:#f59e0b">Amazon</a>
+            <a id="flipkartBtn" class="brand-btn small" style="background:#0369a1">Flipkart</a>
+            <a id="myntraBtn" class="brand-btn small" style="background:#ec4899">Myntra</a>
           </div>
         </div>
       </div>
-
-      <div id="backendDump" style="margin-top:12px;"></div>
     </section>
   </div>
 
-  <!-- top-banner -->
-  <div id="top-banner" class="top-banner" role="region" aria-label="Special offer">
-    <div class="top-banner__marquee" id="topMarquee">
-      <span class="top-banner__text"> ....🎁Chance for free ₹200 gift voucher🎁....</span>
-      <a class="top-banner__cta" href="https://spinwheel-aoae.onrender.com" target="_blank" rel="noopener noreferrer">Click here</a>
+  <!-- small floating banner -->
+  <div style="position:fixed; left:12px; bottom:12px; z-index:9999;">
+    <div style="background:rgba(0,0,0,0.6); padding:10px 12px; border-radius:8px; display:flex; gap:8px; align-items:center;">
+      <span class="small">🎁 Chance for free ₹200 gift voucher</span>
+      <a class="chip" href="https://spinwheel-aoae.onrender.com" target="_blank" rel="noopener noreferrer" style="margin-left:8px; background:var(--ok); color:#041024; text-decoration:none;">Click here</a>
     </div>
-    <button id="topBannerClose" class="top-banner__close" aria-label="Close banner">&times;</button>
   </div>
 
-  <!-- Script: logic -->
   <script>
-  /********** Configuration **********/
+  /********** Config **********/
   const EXCLUDED = new Set(['amazon','flipkart','myntra']);
-  // If your backend path differs change this. Leading slash uses same origin; for remote change to full URL.
   const BACKEND_API = '/api/results';
 
-  /********** Samples and toggles (kept from your code) **********/
-  let useDarkSample = false;
-  let useAiSample = false;
-  const UNSPLASH_DAILY = 'https://images.unsplash.com/photo-1520975928802-4a6a3d0b1082?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=';
-  const UNSPLASH_DARK_SAMPLE = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=';
-  const AI_STUDIO_SAMPLE = 'https://via.placeholder.com/400x300.png?text=AI+sample';
-
-  const ACTIVITY_MAP = {
-    "Daily / Casual": UNSPLASH_DAILY,
-    "Sports / Active": UNSPLASH_DAILY,
-    "High Impact": UNSPLASH_DAILY
-  };
-
-  function pickSample(activityLabel) {
-    if (useAiSample) return AI_STUDIO_SAMPLE;
-    if (useDarkSample) return UNSPLASH_DARK_SAMPLE;
-    return ACTIVITY_MAP[activityLabel] || UNSPLASH_DAILY;
-  }
-
-  /********** Compute bra size (defensive) **********/
+  /********** computeBraSize (same defensive function) **********/
   function computeBraSize(bandInput, bustInput, unitHint = undefined) {
-    const toNumber = v => {
-      const n = Number(v);
-      return Number.isFinite(n) ? n : NaN;
-    };
-
-    let band = toNumber(bandInput);
-    let bust = toNumber(bustInput);
-
-    if (Number.isNaN(band) || Number.isNaN(bust)) {
-      return { error: true, message: 'Invalid measurements. Provide numeric band and bust (cm or in).' };
-    }
-
+    const toNumber = v => { const n = Number(v); return Number.isFinite(n) ? n : NaN; };
+    let band = toNumber(bandInput), bust = toNumber(bustInput);
+    if (Number.isNaN(band) || Number.isNaN(bust)) return { error:true, message:'Invalid measurements' };
     let unit = unitHint ? unitHint.toLowerCase() : (band > 40 || bust > 40 ? 'cm' : 'in');
-    const inToCm = x => x * 2.54;
-    const cmToIn = x => x / 2.54;
-
+    const inToCm = x => x * 2.54, cmToIn = x => x / 2.54;
     const bandCmRaw = unit === 'in' ? inToCm(band) : band;
     const bustCmRaw = unit === 'in' ? inToCm(bust) : bust;
-
     const stdBands = [65,70,75,80,85,90,95,100,105,110,115,120];
     const bandNearest = stdBands.reduce((best, b) => Math.abs(b - bandCmRaw) < Math.abs(best - bandCmRaw) ? b : best, stdBands[0]);
-
     const diffCm = Math.max(0, bustCmRaw - bandNearest);
     const diffInch = diffCm / 2.54;
     const cupIndex = Math.round(diffInch);
     const cupMap = {0:'AA',1:'A',2:'B',3:'C',4:'D',5:'DD',6:'E',7:'F',8:'FF'};
     const cupLetter = cupMap[Math.max(0, Math.min(8, cupIndex))] || 'G';
-
     const bandInch = +(cmToIn(bandNearest)).toFixed(1);
     const sizeStringCm = `${bandNearest}${cupLetter}`;
     const sizeStringIn = `${Math.round(bandInch)}${cupLetter}`;
-
     function shiftCup(letter, shift) {
       const ordered = ['AA','A','B','C','D','DD','E','F','G','H'];
-      const idx = ordered.indexOf(letter);
-      if (idx === -1) return letter;
-      const ni = Math.max(0, Math.min(ordered.length-1, idx + shift));
-      return ordered[ni];
+      const idx = ordered.indexOf(letter); if (idx === -1) return letter;
+      return ordered[Math.max(0, Math.min(ordered.length-1, idx + shift))];
     }
-
     const alternatives = [];
     const idxBand = stdBands.indexOf(bandNearest);
     if (idxBand !== -1) {
-      if (idxBand + 1 < stdBands.length) {
-        const upBand = stdBands[idxBand + 1];
-        const upCup = shiftCup(cupLetter, -1);
-        alternatives.push({ bandCm: upBand, cup: upCup, size: `${upBand}${upCup}` });
-      }
-      if (idxBand - 1 >= 0) {
-        const downBand = stdBands[idxBand - 1];
-        const downCup = shiftCup(cupLetter, +1);
-        alternatives.push({ bandCm: downBand, cup: downCup, size: `${downBand}${downCup}` });
-      }
+      if (idxBand + 1 < stdBands.length) alternatives.push({ bandCm: stdBands[idxBand+1], cup: shiftCup(cupLetter,-1), size:`${stdBands[idxBand+1]}${shiftCup(cupLetter,-1)}` });
+      if (idxBand - 1 >= 0) alternatives.push({ bandCm: stdBands[idxBand-1], cup: shiftCup(cupLetter,1), size:`${stdBands[idxBand-1]}${shiftCup(cupLetter,1)}` });
     }
-
-    const notes = [
-      `Used band ≈ ${bandNearest} cm (rounded from ${Math.round(bandCmRaw)} cm).`,
-      `Bust - band = ${Math.round(diffCm)} cm (~${diffInch.toFixed(2)} in) → cup ${cupLetter}.`,
-      'Try sister sizes if band feels loose/tight.'
-    ];
-    if (unit !== 'cm') notes.push('Input treated as inches and converted to cm.');
-
-    return {
-      error: false,
-      unit,
-      bandInput: band,
-      bustInput: bust,
-      bandCmRaw,
-      bustCmRaw,
-      bandNearest,
-      bandInch,
-      bustInch: +(cmToIn(bustCmRaw)).toFixed(1),
-      differenceCm: +diffCm.toFixed(1),
-      differenceInch: +diffInch.toFixed(2),
-      cupLetter,
-      sizeStringCm,
-      sizeStringIn,
-      sisterSizes: alternatives,
-      notes
-    };
+    const notes = [`Used band ≈ ${bandNearest} cm (rounded).`, `Bust - band = ${Math.round(diffCm)} cm (~${diffInch.toFixed(2)} in) → cup ${cupLetter}.`];
+    return { error:false, unit, bandInput:band, bustInput:bust, bandNearest, bandInch, bustInch: +(cmToIn(bustCmRaw)).toFixed(1), differenceCm:+diffCm.toFixed(1), differenceInch:+diffInch.toFixed(2), cupLetter, sizeStringCm, sizeStringIn, sisterSizes:alternatives, notes };
   }
 
-  /********** Safe link helpers **********/
+  /********** Safe link helpers (only backend URLs are used) **********/
   function applyLinkToElement(el, url) {
     if (!el) return;
-    if (el.tagName === 'A') {
-      el.setAttribute('href', url);
-      el.setAttribute('target', '_blank');
-      el.setAttribute('rel', 'noopener noreferrer');
-      el.classList.remove('disabled');
-    } else {
-      el.onclick = () => window.open(url, '_blank', 'noopener');
-      el.disabled = false;
-      el.classList.remove('disabled');
-    }
+    el.setAttribute('href', url);
+    el.setAttribute('target', '_blank');
+    el.setAttribute('rel', 'noopener noreferrer');
+    el.classList.remove('disabled');
+    el.style.display = '';
   }
-  function disableElement(el) {
-    if (!el) return;
-    if (el.tagName === 'A') {
-      el.removeAttribute('href');
-      el.classList.add('disabled');
-      el.setAttribute('aria-disabled', 'true');
-    } else {
-      el.onclick = null;
-      el.disabled = true;
-      el.classList.add('disabled');
-    }
-  }
-  function setStoreLink(id, url, fallback) {
+  function hideElement(el){ if (!el) return; el.style.display = 'none'; }
+  function setStoreLink(id, url) {
     const el = document.getElementById(id);
     if (!el) return;
-    const href = url || fallback || null;
-    if (href) {
-      applyLinkToElement(el, href);
-      el.style.display = '';
-    } else {
-      el.style.display = 'none';
-    }
+    if (url) applyLinkToElement(el, url); else hideElement(el);
   }
 
-  /********** Fetch with retry **********/
-  async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1200) {
-    for (let i = 0; i <= retries; i++) {
+  /********** Lightweight fetch retry **********/
+  async function fetchWithRetry(url, options={}, retries=2, delayMs=1000) {
+    for (let i=0;i<=retries;i++){
       try {
-        const res = await fetch(url, options);
-        if (!res.ok) {
-          if (res.status >= 500 && i < retries) {
-            await new Promise(r => setTimeout(r, delayMs));
-            continue;
-          }
-          const text = await res.text().catch(()=>null);
-          throw new Error(`HTTP ${res.status} ${text ? ': '+text : ''}`);
+        const r = await fetch(url, options);
+        if (!r.ok) {
+          if (r.status >= 500 && i < retries) { await new Promise(r=>setTimeout(r,delayMs)); continue; }
+          const txt = await r.text().catch(()=>null);
+          throw new Error(`HTTP ${r.status} ${txt?': '+txt:''}`);
         }
-        return await res.json();
+        return await r.json();
       } catch (err) {
-        console.warn(`fetchWithRetry attempt ${i} failed for ${url}:`, err);
         if (i === retries) throw err;
-        await new Promise(r => setTimeout(r, delayMs));
+        await new Promise(r=>setTimeout(r,delayMs));
       }
     }
   }
 
   /********** DOM wiring **********/
   document.addEventListener('DOMContentLoaded', () => {
-    const darkToggle = document.getElementById('darkToggle');
-    const aiMode = document.getElementById('aiMode');
     const searchBtn = document.getElementById('searchBtn');
     const resetBtn = document.getElementById('resetBtn');
     const statusChip = document.getElementById('statusChip');
-    const topBannerClose = document.getElementById('topBannerClose');
-    const topBanner = document.getElementById('top-banner');
+    const notesArea = document.getElementById('notesArea');
+    const sizeHeadline = document.getElementById('sizeHeadline');
+    const sizeMeta = document.getElementById('sizeMeta');
 
-    darkToggle.addEventListener("click", () => {
-      useDarkSample = !useDarkSample;
-      darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
-      darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
+    document.getElementById('darkToggle').addEventListener('click', (e)=> {
+      const btn=e.currentTarget; btn.textContent = btn.textContent.includes('ON') ? 'Dark sample' : 'Dark sample: ON';
     });
-
-    aiMode.addEventListener("click", () => {
-      useAiSample = !useAiSample;
-      aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
-      aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
-    });
-
-    topBannerClose.addEventListener('click', () => {
-      if (topBanner) topBanner.remove();
+    document.getElementById('aiMode').addEventListener('click', (e)=> {
+      const btn=e.currentTarget; btn.textContent = btn.textContent.includes('ON') ? 'AI sample' : 'AI sample ON';
     });
 
     searchBtn.addEventListener('click', async (ev) => {
@@ -315,129 +219,72 @@
       searchBtn.disabled = true;
       searchBtn.textContent = 'Searching...';
 
-      // read inputs
       const bandRaw = parseFloat(document.getElementById("bandInput").value) || 78;
       const bustRaw = parseFloat(document.getElementById("bustInput").value) || 90;
       const activity = document.getElementById("activityInput").value || "Daily / Casual";
       const root = document.getElementById("rootInput").value || "Narrow";
 
-      // compute locally
-      const localSize = computeBraSize(bandRaw, bustRaw);
+      // compute local size
+      const local = computeBraSize(bandRaw, bustRaw);
+      if (local.error) { alert(local.message || 'Invalid'); searchBtn.disabled=false; searchBtn.textContent='Search'; statusChip.textContent='Ready'; return; }
 
-      if (localSize.error) {
-        alert(localSize.message || 'Invalid measurements');
-        searchBtn.disabled = false;
-        searchBtn.textContent = 'Search';
-        statusChip.textContent = 'Ready';
-        return;
-      }
-
-      // payload contains both raw & computed; backend may override cup_letter/band if provided
-      const payload = {
-        band_input: bandRaw,
-        bust_input: bustRaw,
-        band_computed: localSize.bandNearest,
-        cup_computed: localSize.cupLetter,
-        activity,
-        root
-      };
+      // send payload (backend may override cup_letter/band)
+      const payload = { band_input: bandRaw, bust_input: bustRaw, band_computed: local.bandNearest, cup_computed: local.cupLetter, activity, root };
 
       let data = {};
       try {
-        // Use retry wrapper to handle Render wakeups
-        data = await fetchWithRetry(BACKEND_API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }, 3, 1500);
+        data = await fetchWithRetry(BACKEND_API, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) }, 2, 1100);
       } catch (err) {
-        console.warn('Backend call failed; using local computed values.', err);
-        // keep data empty so we fall back to local values (preferred behavior)
+        console.warn('Backend fetch failed, using local values', err);
         data = {};
       }
 
-      // Decide final displayed values: prefer backend when it provides explicit info
-      const bandToShow = data.band || localSize.bandNearest;
-      const bustToShow = data.bust || Math.round(localSize.bustCmRaw);
-      const cupLetterToShow = data.cup_letter || localSize.cupLetter;
-      const diffCmToShow = data.cup_diff ?? localSize.differenceCm;
-      const productNameToShow = data.product_name || localSize.sizeStringCm;
+      // final values prefer backend when provided
+      const bandToShow = data.band || local.bandNearest;
+      const bustToShow = data.bust || Math.round(local.bustInch ? local.bustInch * 2.54 : local.bustInch) || Math.round(local.bustInput);
+      const cupLetterToShow = data.cup_letter || local.cupLetter;
+      const diffCmToShow = data.cup_diff ?? local.differenceCm;
+      const productNameToShow = data.product_name || local.sizeStringCm + ' — ' + activity;
 
-      // Choose image (backend first)
-      let imgUrl = null;
-      if (data.images && data.images.length > 0) {
-        const candidate = data.images[0];
-        if (typeof candidate === 'string' && candidate.length > 40 && !candidate.startsWith('data:image/svg+xml')) {
-          imgUrl = candidate;
-        }
-      }
-      if (!imgUrl) imgUrl = pickSample(activity);
+      // set visible headline to only the bra size (highlighted)
+      sizeHeadline.textContent = productNameToShow;
+      document.getElementById('bandVal').textContent = bandToShow;
+      document.getElementById('bustVal').textContent = bustToShow;
+      document.getElementById('cupVal').textContent = `${cupLetterToShow} (diff ${Math.round(diffCmToShow)} cm)`;
+      notesArea.textContent = local.notes.join(' • ');
 
-      // Update UI
-      const resultImage = document.getElementById('resultImage');
-      const productName = document.getElementById('productName');
-      const bandVal = document.getElementById('bandVal');
-      const bustVal = document.getElementById('bustVal');
-      const cupVal = document.getElementById('cupVal');
-      const notesArea = document.getElementById('notesArea');
+      // set brand links using only backend URLs (no fallbacks)
+      setStoreLink("zivameBtn",  data.store_urls?.zivame || null);
+      setStoreLink("cloviaBtn",  data.store_urls?.clovia || null);
+      setStoreLink("shyawayBtn", data.store_urls?.shyaway || null);
+      setStoreLink("enamorBtn",  data.store_urls?.enamor || null);
+      setStoreLink("amanteBtn",  data.store_urls?.amante || null);
 
-      if (resultImage) resultImage.src = imgUrl;
-      if (productName) productName.textContent = productNameToShow;
-      if (bandVal) bandVal.textContent = bandToShow;
-      if (bustVal) bustVal.textContent = bustToShow;
-      if (cupVal) cupVal.textContent = `${cupLetterToShow}  (diff ${Math.round(diffCmToShow)} cm)`;
-      if (notesArea) notesArea.innerHTML = `<div>${localSize.notes.join(' • ')}</div>`;
+      setStoreLink("amazonBtn",  data.store_urls?.amazon || null);
+      setStoreLink("flipkartBtn", data.store_urls?.flipkart || null);
+      setStoreLink("myntraBtn",  data.store_urls?.myntra || null);
 
-      // Build fallback search query: prefer product_name then computed size + prefs
-      const fallbackName = (data.product_name) ? data.product_name : `${localSize.sizeStringCm} ${activity} ${root}`;
-      const nameForQuery = encodeURIComponent(fallbackName);
-
-      // set brand links (override fallback for Indian brands, but keep DB links if present)
-      setStoreLink("zivameBtn",  data.store_urls?.zivame || null, null);
-      setStoreLink("cloviaBtn",  data.store_urls?.clovia || null, null);
-      setStoreLink("shyawayBtn", data.store_urls?.shyaway || null, null);
-      setStoreLink("enamorBtn",  data.store_urls?.enamor || null, null);
-      setStoreLink("amanteBtn",  data.store_urls?.amante || null, null);
-      
-      // marketplaces (do NOT override with fallback) — only show if DB link present
-      setStoreLink("amazonBtn", data.store_urls?.amazon || null, null);
-      setStoreLink("flipkartBtn", data.store_urls?.flipkart || null, null);
-      setStoreLink("myntraBtn", data.store_urls?.myntra || null, null);
-
-      // show result card
+      // show results card (only the highlighted size + concise meta)
       document.getElementById('resultsCard').classList.remove('hidden');
 
-      // optional debug: show backend raw JSON
-      const backendDump = document.getElementById('backendDump');
-      if (backendDump) backendDump.innerHTML = (Object.keys(data).length > 0) ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : '';
+      // finalize UI state
+      searchBtn.disabled = false;
+      searchBtn.textContent = 'Search';
+      statusChip.textContent = 'Ready';
 
-      // scroll to results
+      // scroll to results smoothly
       setTimeout(()=> window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" }), 120);
+    });
 
-      statusChip.textContent = 'Done';
-    }); // searchBtn click
-
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', (e)=>{ e.preventDefault();
       document.getElementById("bandInput").value = 78;
       document.getElementById("bustInput").value = 90;
       document.getElementById("activityInput").value = "Daily / Casual";
       document.getElementById("rootInput").value = "Narrow";
-      document.getElementById("resultsCard").classList.add("hidden");
-      statusChip.textContent = 'Ready';
+      document.getElementById("resultsCard").classList.add('hidden');
+      document.getElementById('statusChip').textContent = 'Ready';
     });
-
-    // Loader fade-out
-    window.addEventListener("load", function () {
-      const loader = document.getElementById("animated-global-loader");
-      if (!loader) return;
-      loader.classList.add("fade-out");
-      setTimeout(() => { if (loader && loader.parentNode) loader.remove(); }, 450);
-    });
-
-    // ensure top-banner close works
-    if (topBannerClose) topBannerClose.addEventListener('click', () => topBanner && topBanner.remove());
-
-  }); // DOMContentLoaded
+  });
   </script>
 </body>
 </html>
