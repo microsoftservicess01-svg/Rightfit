@@ -4,144 +4,134 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RightFit — The Smart Way to Choose Your Perfect Fit</title>
-
-  <!-- Tailwind CDN (optional) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Local stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
+  <style>
+    /* Minimal inline styles to match your layout and keep the example self-contained.
+       Replace with your real site CSS if you have one. */
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background: linear-gradient(#071227,#042034); color:#fff; min-height:100vh; }
+    .container { max-width:920px; margin:32px auto; padding:0 16px; }
+    .card { background:#0b1420; border-radius:10px; box-shadow:0 8px 28px rgba(2,6,23,0.6); padding:18px; color:#e6eef8; }
+    .p-6 { padding: 1.5rem; }
+    .text-lg { font-size:1.125rem; }
+    .font-bold { font-weight:700; }
+    .mb-4 { margin-bottom:1rem; }
+    .space-y-3 > * + * { margin-top: .75rem; }
+    input[type="number"], select { width:100%; padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02); color:#fff; }
+    button { padding:10px 18px; border-radius:8px; border:none; cursor:pointer; }
+    .primary { background:#2b6ef6; color:white; }
+    .muted { background:rgba(255,255,255,0.04); color:#dbeafe; }
+    .btn-row { display:flex; gap:10px; margin-top:12px; align-items:center; }
+    .brands { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .brand-btn { display:inline-block; padding:10px 12px; border-radius:8px; text-decoration:none; color:#fff; font-weight:600; }
+    .hidden { display:none; }
+    #resultImage { width:100%; max-width:160px; border-radius:8px; background:#0f1724; display:block; margin-bottom:8px; }
+    #resultsCard .card { margin-top:18px; }
+    .small { font-size:0.9rem; color:#bcd3f0; }
+    .disabled { opacity:0.4; pointer-events:none; }
+    .top-banner { position: fixed; left: 12px; bottom: 12px; background: rgba(0,0,0,0.6); padding: 10px 12px; border-radius: 8px; display:flex; gap:10px; align-items:center; z-index: 9999; }
+    .top-banner__cta { background:#10b981; padding:6px 10px; border-radius:6px; color:#041024; text-decoration:none; font-weight:700; }
+    .top-banner__close { background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; }
+    .loader { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); z-index:9998; }
+    .fade-out { opacity:0; transition: opacity .45s ease; }
+    .chip { background: rgba(255,255,255,0.04); padding:6px 10px; border-radius:999px; color:#e6eef8; }
+    pre { background: rgba(0,0,0,0.25); padding:10px; overflow:auto; border-radius:8px; color:#dbeafe; }
+  </style>
 </head>
-<body class="p-4">
+<body>
+  <!-- loader (will fade) -->
+  <div id="animated-global-loader" class="loader"><div class="card p-6">Loading…</div></div>
 
-<!-- Animated Loader -->
-<div id="animated-global-loader">
-  <div class="loader-inner">
-    <!-- Minimal inline SVG bra -->
-    <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg">
-      <g class="bra-cup" transform="translate(36, 36)">
-        <path d="M24 44 C4 40, 2 20, 24 12 C46 4, 70 16, 74 36 C74 44, 56 56, 36 54 C30 54, 26 48, 24 44 Z"
-              fill="#FAD3E0" stroke="#E16A9E" stroke-width="2" />
-      </g>
-      <g class="bra-cup" transform="translate(110, 36)">
-        <path d="M24 44 C4 40, 2 20, 24 12 C46 4, 70 16, 74 36 C74 44, 56 56, 36 54 C30 54, 26 48, 24 44 Z"
-              fill="#FAD3E0" stroke="#E16A9E" stroke-width="2" />
-      </g>
-      <path class="bra-strap" d="M70 48 C90 26, 130 26, 150 48"
-            fill="none" stroke="#3A6EA5" stroke-width="6" stroke-linecap="round"/>
-      <path class="bra-outline" d="M18 70 C46 84, 62 94, 104 98 C146 94, 162 84, 190 70"
-            fill="none" stroke="#203B5A" stroke-width="4" stroke-linecap="round"/>
-      <circle class="bra-spark" cx="110" cy="26" r="4" fill="#FFD66B"/>
-    </svg>
+  <div class="container">
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <h1 style="margin:0; font-size:1.25rem;">RightFit</h1>
+        <div class="small">The Smart Way to Choose Your Perfect Fit</div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="darkToggle" class="muted">Dark sample</button>
+        <button id="aiMode" class="muted">AI sample</button>
+      </div>
+    </header>
 
-    <div class="loader-text">Finding your perfect fit…</div>
+    <!-- FORM CARD -->
+    <section class="card p-6">
+      <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
+      <div class="space-y-3">
+        <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
+        <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
+        <select id="activityInput" class="w-full p-3 rounded-lg border">
+          <option>Daily / Casual</option>
+          <option>Sports / Active</option>
+          <option>High Impact</option>
+        </select>
+        <select id="rootInput" class="w-full p-3 rounded-lg border">
+          <option>Narrow</option>
+          <option>Average</option>
+          <option>Wide</option>
+        </select>
+
+        <div class="btn-row">
+          <button id="searchBtn" class="primary">Search</button>
+          <button id="resetBtn" class="muted">Reset</button>
+          <span id="statusChip" class="chip" style="margin-left:auto;">Ready</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="resultsCard" class="card p-6 hidden">
+      <div style="display:flex; gap:18px; align-items:flex-start;">
+        <img id="resultImage" src="" alt="Product sample" />
+        <div style="flex:1;">
+          <h3 id="productName" style="margin:0 0 6px 0;">Comfort</h3>
+          <div class="small">Band: <span id="bandVal">--</span> &nbsp; | &nbsp; Bust: <span id="bustVal">--</span> &nbsp; | &nbsp; Cup: <span id="cupVal">--</span></div>
+          <div id="notesArea" class="small" style="margin-top:8px;"></div>
+
+          <div class="brands" style="margin-top:12px;">
+            <a id="zivameBtn" class="brand-btn" style="background:#ff6b6b">View on Zivame</a>
+            <a id="cloviaBtn" class="brand-btn" style="background:#ff73a0">View on Clovia</a>
+            <a id="shyawayBtn" class="brand-btn" style="background:#ff5fb7">View on Shyaway</a>
+            <a id="enamorBtn" class="brand-btn" style="background:#7c3aed">View on Enamor</a>
+            <a id="amanteBtn" class="brand-btn" style="background:#f97316">View on Amante</a>
+
+            <a id="amazonBtn" class="brand-btn" style="background:#f59e0b">View on Amazon</a>
+            <a id="flipkartBtn" class="brand-btn" style="background:#0369a1">View on Flipkart</a>
+            <a id="myntraBtn" class="brand-btn" style="background:#ec4899">View on Myntra</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="backendDump" style="margin-top:12px;"></div>
+    </section>
   </div>
-</div>
 
-<header class="mb-6 max-w-3xl mx-auto">
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-extrabold">RightFit</h1>
-      <p class="text-sm text-slate-300 mt-1">The Smart Way to Choose Your Perfect Fit</p>
+  <!-- top-banner -->
+  <div id="top-banner" class="top-banner" role="region" aria-label="Special offer">
+    <div class="top-banner__marquee" id="topMarquee">
+      <span class="top-banner__text"> ....🎁Chance for free ₹200 gift voucher🎁....</span>
+      <a class="top-banner__cta" href="https://spinwheel-aoae.onrender.com" target="_blank" rel="noopener noreferrer">Click here</a>
     </div>
-    <div class="flex items-center gap-3">
-      <div id="aiMode" class="chip" title="Use custom AI studio image">AI sample</div>
-      <button id="darkToggle" class="theme-toggle" title="Toggle darker sample">Dark sample</button>
-    </div>
+    <button id="topBannerClose" class="top-banner__close" aria-label="Close banner">&times;</button>
   </div>
-</header>
 
-<main class="max-w-3xl mx-auto">
+  <!-- Script: logic -->
+  <script>
+  /********** Configuration **********/
+  const EXCLUDED = new Set(['amazon','flipkart','myntra']);
+  // If your backend path differs change this. Leading slash uses same origin; for remote change to full URL.
+  const BACKEND_API = '/api/results';
 
-  <!-- FORM CARD -->
-  <section class="card p-6">
-    <h2 class="text-lg font-bold mb-4">Get Your Recommendation</h2>
-    <div class="space-y-3">
-      <input id="bandInput" type="number" placeholder="Underbust (band) cm" class="w-full p-3 rounded-lg border" value="78">
-      <input id="bustInput" type="number" placeholder="Full bust (bust) cm" class="w-full p-3 rounded-lg border" value="90">
-      <select id="activityInput" class="w-full p-3 rounded-lg border">
-        <option>Daily / Casual</option>
-        <option>Sports / Active</option>
-        <option>High Impact</option>
-      </select>
-      <select id="rootInput" class="w-full p-3 rounded-lg border">
-        <option>Narrow</option>
-        <option>Average</option>
-        <option>Wide</option>
-      </select>
-    </div>
-
-    <div class="mt-4 flex gap-3">
-      <button id="searchBtn" class="flex-1 py-3 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white">Search</button>
-      <button id="resetBtn" class="py-3 px-4 rounded-lg font-semibold bg-white/10">Reset</button>
-    </div>
-  </section>
-
-  <!-- RESULTS CARD (updated to include brand buttons) -->
-  <section id="resultsCard" class="card p-6 mt-6 hidden">
-    <h3 id="productName" class="text-xl font-bold mb-4">Comfort 80B — Example</h3>
-
-    <div class="flex justify-center mb-4">
-      <img id="resultImage" src="" alt="Product sample" class="w-full max-w-xl rounded-lg object-cover shadow-lg" />
-    </div>
-
-    <div class="text-slate-700 mb-4">
-      <p><strong>Band:</strong> <span id="bandVal">78</span> cm</p>
-      <p><strong>Bust:</strong> <span id="bustVal">90</span> cm</p>
-      <p><strong>Cup difference:</strong> <span id="cupVal">12</span> cm</p>
-    </div>
-
-    <!-- store buttons: Indian brands FIRST, marketplaces after -->
-    <div class="store-stack flex flex-wrap gap-3" aria-label="Store links">
-      <!-- Indian brands (hidden by default; shown by JS if present) -->
-      <a id="zivameBtn" class="store-btn zivame py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Zivame</a>
-      <a id="cloviaBtn" class="store-btn clovia py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Clovia</a>
-      <a id="shyawayBtn" class="store-btn shyaway py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Shyaway</a>
-      <a id="enamorBtn" class="store-btn enamor py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Enamor</a>
-      <a id="amanteBtn" class="store-btn amante py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amante</a>
-
-      <!-- Marketplaces -->
-      <a id="amazonBtn" class="store-btn amazon py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Amazon</a>
-      <a id="flipkartBtn" class="store-btn flipkart py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Flipkart</a>
-      <a id="myntraBtn" class="store-btn myntra py-3 rounded-lg text-center font-bold text-white" href="#" target="_blank" rel="noopener" style="display:none">View on Myntra</a>
-    </div>
-  </section>
-
-</main>
-
-<script>
-  // Sample images (fallbacks)
-  const UNSPLASH_DAILY = "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&w=1200&q=80";
-  const UNSPLASH_SPORTS = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&w=1200&q=80";
-  const UNSPLASH_HIGHIMPACT = "https://images.unsplash.com/photo-1593032465178-3f2f8b3f2f4f?auto=format&w=1200&q=80";
-  const UNSPLASH_DARK_SAMPLE = "https://images.unsplash.com/photo-1557682250-ffe0f1659a77?auto=format&w=1200&q=80";
-  const AI_STUDIO_SAMPLE = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&w=1200&q=80";
+  /********** Samples and toggles (kept from your code) **********/
+  let useDarkSample = false;
+  let useAiSample = false;
+  const UNSPLASH_DAILY = 'https://images.unsplash.com/photo-1520975928802-4a6a3d0b1082?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=';
+  const UNSPLASH_DARK_SAMPLE = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=';
+  const AI_STUDIO_SAMPLE = 'https://via.placeholder.com/400x300.png?text=AI+sample';
 
   const ACTIVITY_MAP = {
     "Daily / Casual": UNSPLASH_DAILY,
-    "Sports / Active": UNSPLASH_SPORTS,
-    "High Impact": UNSPLASH_HIGHIMPACT
+    "Sports / Active": UNSPLASH_DAILY,
+    "High Impact": UNSPLASH_DAILY
   };
-
-  let useDarkSample = false;
-  let useAiSample = false;
-
-  const darkToggle = document.getElementById("darkToggle");
-  const aiMode = document.getElementById("aiMode");
-  const searchBtn = document.getElementById("searchBtn");
-  const resetBtn = document.getElementById("resetBtn");
-
-  darkToggle.addEventListener("click", () => {
-    useDarkSample = !useDarkSample;
-    darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
-    darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
-  });
-
-  aiMode.addEventListener("click", () => {
-    useAiSample = !useAiSample;
-    aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
-    aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
-  });
 
   function pickSample(activityLabel) {
     if (useAiSample) return AI_STUDIO_SAMPLE;
@@ -149,115 +139,306 @@
     return ACTIVITY_MAP[activityLabel] || UNSPLASH_DAILY;
   }
 
-  // Helper to set an anchor href and show/hide it
+  /********** Compute bra size (defensive) **********/
+  function computeBraSize(bandInput, bustInput, unitHint = undefined) {
+    const toNumber = v => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : NaN;
+    };
+
+    let band = toNumber(bandInput);
+    let bust = toNumber(bustInput);
+
+    if (Number.isNaN(band) || Number.isNaN(bust)) {
+      return { error: true, message: 'Invalid measurements. Provide numeric band and bust (cm or in).' };
+    }
+
+    let unit = unitHint ? unitHint.toLowerCase() : (band > 40 || bust > 40 ? 'cm' : 'in');
+    const inToCm = x => x * 2.54;
+    const cmToIn = x => x / 2.54;
+
+    const bandCmRaw = unit === 'in' ? inToCm(band) : band;
+    const bustCmRaw = unit === 'in' ? inToCm(bust) : bust;
+
+    const stdBands = [65,70,75,80,85,90,95,100,105,110,115,120];
+    const bandNearest = stdBands.reduce((best, b) => Math.abs(b - bandCmRaw) < Math.abs(best - bandCmRaw) ? b : best, stdBands[0]);
+
+    const diffCm = Math.max(0, bustCmRaw - bandNearest);
+    const diffInch = diffCm / 2.54;
+    const cupIndex = Math.round(diffInch);
+    const cupMap = {0:'AA',1:'A',2:'B',3:'C',4:'D',5:'DD',6:'E',7:'F',8:'FF'};
+    const cupLetter = cupMap[Math.max(0, Math.min(8, cupIndex))] || 'G';
+
+    const bandInch = +(cmToIn(bandNearest)).toFixed(1);
+    const sizeStringCm = `${bandNearest}${cupLetter}`;
+    const sizeStringIn = `${Math.round(bandInch)}${cupLetter}`;
+
+    function shiftCup(letter, shift) {
+      const ordered = ['AA','A','B','C','D','DD','E','F','G','H'];
+      const idx = ordered.indexOf(letter);
+      if (idx === -1) return letter;
+      const ni = Math.max(0, Math.min(ordered.length-1, idx + shift));
+      return ordered[ni];
+    }
+
+    const alternatives = [];
+    const idxBand = stdBands.indexOf(bandNearest);
+    if (idxBand !== -1) {
+      if (idxBand + 1 < stdBands.length) {
+        const upBand = stdBands[idxBand + 1];
+        const upCup = shiftCup(cupLetter, -1);
+        alternatives.push({ bandCm: upBand, cup: upCup, size: `${upBand}${upCup}` });
+      }
+      if (idxBand - 1 >= 0) {
+        const downBand = stdBands[idxBand - 1];
+        const downCup = shiftCup(cupLetter, +1);
+        alternatives.push({ bandCm: downBand, cup: downCup, size: `${downBand}${downCup}` });
+      }
+    }
+
+    const notes = [
+      `Used band ≈ ${bandNearest} cm (rounded from ${Math.round(bandCmRaw)} cm).`,
+      `Bust - band = ${Math.round(diffCm)} cm (~${diffInch.toFixed(2)} in) → cup ${cupLetter}.`,
+      'Try sister sizes if band feels loose/tight.'
+    ];
+    if (unit !== 'cm') notes.push('Input treated as inches and converted to cm.');
+
+    return {
+      error: false,
+      unit,
+      bandInput: band,
+      bustInput: bust,
+      bandCmRaw,
+      bustCmRaw,
+      bandNearest,
+      bandInch,
+      bustInch: +(cmToIn(bustCmRaw)).toFixed(1),
+      differenceCm: +diffCm.toFixed(1),
+      differenceInch: +diffInch.toFixed(2),
+      cupLetter,
+      sizeStringCm,
+      sizeStringIn,
+      sisterSizes: alternatives,
+      notes
+    };
+  }
+
+  /********** Safe link helpers **********/
+  function applyLinkToElement(el, url) {
+    if (!el) return;
+    if (el.tagName === 'A') {
+      el.setAttribute('href', url);
+      el.setAttribute('target', '_blank');
+      el.setAttribute('rel', 'noopener noreferrer');
+      el.classList.remove('disabled');
+    } else {
+      el.onclick = () => window.open(url, '_blank', 'noopener');
+      el.disabled = false;
+      el.classList.remove('disabled');
+    }
+  }
+  function disableElement(el) {
+    if (!el) return;
+    if (el.tagName === 'A') {
+      el.removeAttribute('href');
+      el.classList.add('disabled');
+      el.setAttribute('aria-disabled', 'true');
+    } else {
+      el.onclick = null;
+      el.disabled = true;
+      el.classList.add('disabled');
+    }
+  }
   function setStoreLink(id, url, fallback) {
     const el = document.getElementById(id);
     if (!el) return;
-    const href = url || fallback || "#";
-    if (href && href !== "#") {
-      el.href = href;
-      el.style.display = ""; // show
+    const href = url || fallback || null;
+    if (href) {
+      applyLinkToElement(el, href);
+      el.style.display = '';
     } else {
-      el.style.display = "none"; // hide if no url
+      el.style.display = 'none';
     }
   }
 
-  searchBtn.addEventListener("click", async () => {
-    const band = parseFloat(document.getElementById("bandInput").value) || 78;
-    const bust = parseFloat(document.getElementById("bustInput").value) || 90;
-    const activity = document.getElementById("activityInput").value || "Daily / Casual";
-    const root = document.getElementById("rootInput").value || "Narrow";
+  /********** Fetch with retry **********/
+  async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 1200) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          if (res.status >= 500 && i < retries) {
+            await new Promise(r => setTimeout(r, delayMs));
+            continue;
+          }
+          const text = await res.text().catch(()=>null);
+          throw new Error(`HTTP ${res.status} ${text ? ': '+text : ''}`);
+        }
+        return await res.json();
+      } catch (err) {
+        console.warn(`fetchWithRetry attempt ${i} failed for ${url}:`, err);
+        if (i === retries) throw err;
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+    }
+  }
 
-    searchBtn.disabled = true;
-    searchBtn.textContent = "Searching...";
+  /********** DOM wiring **********/
+  document.addEventListener('DOMContentLoaded', () => {
+    const darkToggle = document.getElementById('darkToggle');
+    const aiMode = document.getElementById('aiMode');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusChip = document.getElementById('statusChip');
+    const topBannerClose = document.getElementById('topBannerClose');
+    const topBanner = document.getElementById('top-banner');
 
-    try {
-      const res = await fetch("/api/results", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ band, bust, activity, root })
-      });
+    darkToggle.addEventListener("click", () => {
+      useDarkSample = !useDarkSample;
+      darkToggle.textContent = useDarkSample ? "Dark sample: ON" : "Dark sample";
+      darkToggle.style.background = useDarkSample ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)";
+    });
 
-      const data = await res.json();
+    aiMode.addEventListener("click", () => {
+      useAiSample = !useAiSample;
+      aiMode.textContent = useAiSample ? "AI sample ON" : "AI sample";
+      aiMode.style.background = useAiSample ? "#f3f4f6" : "rgba(2,6,23,0.04)";
+    });
 
-      // Determine image to use
+    topBannerClose.addEventListener('click', () => {
+      if (topBanner) topBanner.remove();
+    });
+
+    searchBtn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      statusChip.textContent = 'Searching…';
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Searching...';
+
+      // read inputs
+      const bandRaw = parseFloat(document.getElementById("bandInput").value) || 78;
+      const bustRaw = parseFloat(document.getElementById("bustInput").value) || 90;
+      const activity = document.getElementById("activityInput").value || "Daily / Casual";
+      const root = document.getElementById("rootInput").value || "Narrow";
+
+      // compute locally
+      const localSize = computeBraSize(bandRaw, bustRaw);
+
+      if (localSize.error) {
+        alert(localSize.message || 'Invalid measurements');
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Search';
+        statusChip.textContent = 'Ready';
+        return;
+      }
+
+      // payload contains both raw & computed; backend may override cup_letter/band if provided
+      const payload = {
+        band_input: bandRaw,
+        bust_input: bustRaw,
+        band_computed: localSize.bandNearest,
+        cup_computed: localSize.cupLetter,
+        activity,
+        root
+      };
+
+      let data = {};
+      try {
+        // Use retry wrapper to handle Render wakeups
+        data = await fetchWithRetry(BACKEND_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }, 3, 1500);
+      } catch (err) {
+        console.warn('Backend call failed; using local computed values.', err);
+        // keep data empty so we fall back to local values (preferred behavior)
+        data = {};
+      }
+
+      // Decide final displayed values: prefer backend when it provides explicit info
+      const bandToShow = data.band || localSize.bandNearest;
+      const bustToShow = data.bust || Math.round(localSize.bustCmRaw);
+      const cupLetterToShow = data.cup_letter || localSize.cupLetter;
+      const diffCmToShow = data.cup_diff ?? localSize.differenceCm;
+      const productNameToShow = data.product_name || localSize.sizeStringCm;
+
+      // Choose image (backend first)
       let imgUrl = null;
       if (data.images && data.images.length > 0) {
         const candidate = data.images[0];
-        if (typeof candidate === "string" && candidate.length > 40 && !candidate.startsWith("data:image/svg+xml")) {
+        if (typeof candidate === 'string' && candidate.length > 40 && !candidate.startsWith('data:image/svg+xml')) {
           imgUrl = candidate;
         }
       }
-      if (!imgUrl) {
-        imgUrl = pickSample(activity);
-      }
+      if (!imgUrl) imgUrl = pickSample(activity);
 
-      // update UI
-      document.getElementById("resultImage").src = imgUrl;
-      document.getElementById("productName").textContent = data.product_name || ("Comfort " + Math.round(band));
-      document.getElementById("bandVal").textContent = data.band || band;
-      document.getElementById("bustVal").textContent = data.bust || bust;
-      document.getElementById("cupVal").textContent = data.cup_diff ?? Math.round((bust - band));
+      // Update UI
+      const resultImage = document.getElementById('resultImage');
+      const productName = document.getElementById('productName');
+      const bandVal = document.getElementById('bandVal');
+      const bustVal = document.getElementById('bustVal');
+      const cupVal = document.getElementById('cupVal');
+      const notesArea = document.getElementById('notesArea');
 
-      // build a readable query for fallback searches
-      const nameForQuery = encodeURIComponent(data.product_name || (Math.round(band) + " bra"));
+      if (resultImage) resultImage.src = imgUrl;
+      if (productName) productName.textContent = productNameToShow;
+      if (bandVal) bandVal.textContent = bandToShow;
+      if (bustVal) bustVal.textContent = bustToShow;
+      if (cupVal) cupVal.textContent = `${cupLetterToShow}  (diff ${Math.round(diffCmToShow)} cm)`;
+      if (notesArea) notesArea.innerHTML = `<div>${localSize.notes.join(' • ')}</div>`;
 
-      // set brand links (Indian brands first)
+      // Build fallback search query: prefer product_name then computed size + prefs
+      const fallbackName = (data.product_name) ? data.product_name : `${localSize.sizeStringCm} ${activity} ${root}`;
+      const nameForQuery = encodeURIComponent(fallbackName);
+
+      // set brand links (override fallback for Indian brands, but keep DB links if present)
       setStoreLink("zivameBtn",  data.store_urls?.zivame,  `https://www.zivame.com/search?q=${nameForQuery}`);
       setStoreLink("cloviaBtn",  data.store_urls?.clovia,  `https://www.clovia.com/search/?q=${nameForQuery}`);
       setStoreLink("shyawayBtn", data.store_urls?.shyaway, `https://www.shyaway.com/catalogsearch/result/?q=${nameForQuery}`);
       setStoreLink("enamorBtn",  data.store_urls?.enamor,  `https://www.enamor.co.in/search?q=${nameForQuery}`);
       setStoreLink("amanteBtn",  data.store_urls?.amante,  `https://www.amantelingerie.com/search?q=${nameForQuery}`);
 
-      // marketplaces
-      setStoreLink("amazonBtn", data.store_urls?.amazon, `https://www.amazon.in/s?k=${nameForQuery}`);
-      setStoreLink("flipkartBtn", data.store_urls?.flipkart, `https://www.flipkart.com/search?q=${nameForQuery}`);
-      setStoreLink("myntraBtn", data.store_urls?.myntra, `https://www.myntra.com/search?q=${nameForQuery}`);
+      // marketplaces (do NOT override with fallback) — only show if DB link present
+      setStoreLink("amazonBtn", data.store_urls?.amazon || null, null);
+      setStoreLink("flipkartBtn", data.store_urls?.flipkart || null, null);
+      setStoreLink("myntraBtn", data.store_urls?.myntra || null, null);
 
-      document.getElementById("resultsCard").classList.remove("hidden");
+      // show result card
+      document.getElementById('resultsCard').classList.remove('hidden');
+
+      // optional debug: show backend raw JSON
+      const backendDump = document.getElementById('backendDump');
+      if (backendDump) backendDump.innerHTML = (Object.keys(data).length > 0) ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : '';
+
+      // scroll to results
       setTimeout(()=> window.scrollTo({ top: document.getElementById("resultsCard").offsetTop - 20, behavior: "smooth" }), 120);
 
-    } catch (err) {
-      console.error("Error fetching results:", err);
-      alert("Could not fetch results — try again.");
-    } finally {
-      searchBtn.disabled = false;
-      searchBtn.textContent = "Search";
-    }
-  });
+      statusChip.textContent = 'Done';
+    }); // searchBtn click
 
-  resetBtn.addEventListener("click", () => {
-    document.getElementById("bandInput").value = 78;
-    document.getElementById("bustInput").value = 90;
-    document.getElementById("activityInput").value = "Daily / Casual";
-    document.getElementById("rootInput").value = "Narrow";
-    document.getElementById("resultsCard").classList.add("hidden");
-  });
+    resetBtn.addEventListener('click', () => {
+      document.getElementById("bandInput").value = 78;
+      document.getElementById("bustInput").value = 90;
+      document.getElementById("activityInput").value = "Daily / Casual";
+      document.getElementById("rootInput").value = "Narrow";
+      document.getElementById("resultsCard").classList.add("hidden");
+      statusChip.textContent = 'Ready';
+    });
 
-  // Loader fade-out
-  window.addEventListener("load", function () {
-    const loader = document.getElementById("animated-global-loader");
-    if (!loader) return;
-    loader.classList.add("fade-out");
-    setTimeout(() => { if (loader && loader.parentNode) loader.remove(); }, 450);
-  });
+    // Loader fade-out
+    window.addEventListener("load", function () {
+      const loader = document.getElementById("animated-global-loader");
+      if (!loader) return;
+      loader.classList.add("fade-out");
+      setTimeout(() => { if (loader && loader.parentNode) loader.remove(); }, 450);
+    });
 
-</script>
-<!-- START: top-banner -->
-<div id="top-banner" class="top-banner" role="region" aria-label="Special offer">
-  <div class="top-banner__marquee" id="topMarquee">
-    <span class="top-banner__text"> ....🎁Chance for free ₹200 gift voucher🎁....</span>
-    <a class="top-banner__cta" 
-       href="https://spinwheel-aoae.onrender.com"
-       target="_blank" 
-       rel="noopener noreferrer">
-       Click here
-    </a>
-  </div>
+    // ensure top-banner close works
+    if (topBannerClose) topBannerClose.addEventListener('click', () => topBanner && topBanner.remove());
 
-  <button id="topBannerClose" class="top-banner__close" aria-label="Close banner">&times;</button>
-</div>
-<!-- END: top-banner -->
-  
+  }); // DOMContentLoaded
+  </script>
 </body>
 </html>
+
