@@ -241,17 +241,32 @@
 
       // final values prefer backend when provided
       const bandToShow = data.band || local.bandNearest;
-      const bustToShow = data.bust || Math.round(local.bustInch ? local.bustInch * 2.54 : local.bustInch) || Math.round(local.bustInput);
+      const bustToShow =
+        data.bust ||
+        Math.round(local.bustInch ? local.bustInch * 2.54 : local.bustInch) ||
+        Math.round(local.bustInput);
+
       const cupLetterToShow = data.cup_letter || local.cupLetter;
       const diffCmToShow = data.cup_diff ?? local.differenceCm;
-      const productNameToShow = data.product_name || local.sizeStringCm + ' — ' + activity;
 
-      // set visible headline to only the bra size (highlighted)
-      sizeHeadline.textContent = productNameToShow;
-      document.getElementById('bandVal').textContent = bandToShow;
-      document.getElementById('bustVal').textContent = bustToShow;
-      document.getElementById('cupVal').textContent = `${cupLetterToShow} (diff ${Math.round(diffCmToShow)} cm)`;
-      notesArea.textContent = local.notes.join(' • ');
+      // Build display strings: sizeNumber + cupLetter (e.g. "78E")
+      const displaySizeNumberLetter = `${bandToShow}${cupLetterToShow}`;
+
+      // Headline: show brand-like label + number+letter + activity
+      // Example: "Comfort 78E — Daily / Casual"
+      const headlineText = `Comfort ${displaySizeNumberLetter} — ${activity}`;
+
+      // Set headline and concise meta
+      sizeHeadline.textContent = headlineText;
+      document.getElementById("bandVal").textContent = bandToShow;
+      document.getElementById("bustVal").textContent = bustToShow;
+
+      // show cup letter and numeric diff
+      document.getElementById("cupVal").textContent =
+        `${cupLetterToShow} (diff ${Math.round(diffCmToShow)} cm)`;
+
+      notesArea.textContent 
+      = local.notes.join(" • ");
 
       // set brand links using only backend URLs (no fallbacks)
       setStoreLink("zivameBtn",  "https://www.zivame.com");
